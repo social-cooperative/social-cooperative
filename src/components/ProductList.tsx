@@ -22,9 +22,13 @@ const adminSelector = store => !!store.claims.admin
 export const productSlug = model => model.id + '|' + hash(model.name + model.unit + model.price)
 
 const Product = props => {
-  const admin = useSelector(adminSelector)
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
-  const { model } = props
+  const { model, edit, admin } = props
+
+  const deleteProduct = useCallback(() => {
+    if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`))
+      database.ref(`products/${model.id}`).set(null).catch(() => { })
+  }, [model])
 
   const addToBasket = useCallback(() => {
     const slug = productSlug(model)
@@ -43,43 +47,45 @@ const Product = props => {
         })
       }
     })
-  }, [count])
+  }, [count, model])
 
   const canBuy = !!model.price
 
   return (
-    <tr className="product" style={{ background: props.darker ? '#eeeeee' : undefined }}>
+    <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
       <td className="image">
-        <FirebaseImageUploader src={model.image} saveAs={`products/${model.id}`} databasePath={`/products/${model.id}/image`} component={CellImg} />
+        <FirebaseImageUploader src={model.image} saveAs={`products/${model.id}`} databasePath={`/products/${model.id}/image`} component={CellImg} enabled={edit} />
       </td><td>
         <Typography variant="h6">
-          <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={admin} />
+          <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
         </Typography>
       </td><td>
         <Typography variant="h6">
-          <FirebaseEditorField path={`/products/${model.id}/price`} value={model.price} enabled={admin} number>
+          <FirebaseEditorField path={`/products/${model.id}/price`} value={model.price} enabled={edit} number>
             {price => price ? String(price).replace('.', ',') + 'р.' : '-'}
           </FirebaseEditorField>
         </Typography>
       </td><td>
         <Typography variant="h6">
-          <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={admin} />
+          <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={edit} />
         </Typography>
       </td><td>
         <Typography>
-          <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={admin} />
+          <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={edit} />
         </Typography>
-      </td><td>
+      </td>{admin && <td>
+        <Typography>
+          <FirebaseEditorField path={`/products/${model.id}/commentInternal`} value={model.commentInternal} enabled={edit} />
+        </Typography>
+      </td>}{!edit && <td>
         <input disabled={!canBuy} size={11} style={{ display: 'block', textAlign: 'center' }} value={canBuy ? count : 'Нет в наличии'} readOnly />
         <div style={{ display: 'flex' }}>
           <button disabled={!canBuy} style={{ width: 25 }} onClick={incCount}>+</button>
           <button disabled={!canBuy} style={{ width: 25 }} onClick={decCount}>-</button>
           <button disabled={!canBuy} style={{ flex: 1 }} onClick={addToBasket}><small>В корзину</small></button>
         </div>
-      </td>{admin && <td>
-        <Typography>
-          <FirebaseEditorField path={`/products/${model.id}/commentInternal`} value={model.commentInternal} enabled={admin} />
-        </Typography>
+      </td>}{edit && <td>
+        <button onClick={deleteProduct}>🗑️</button>
       </td>}
     </tr>
   )
@@ -90,17 +96,46 @@ import { hash, log, subscribe, useCounter, useSelector, useToggle } from '../uti
 import React, { useCallback, useEffect, useState } from 'react'
 import FirebaseEditorField from './FirebaseEditorField'
 import FirebaseImageUploader from './FirebaseImageUploader'
+import PageTitle from './PageTitle'
+import EditorField from './EditorField'
 
-const categorize = products => products.reduce((acc, v) => ((acc[v.category] ? acc[v.category].push(v) : (acc[v.category] = [v])), acc), {}) as any
+const CategoryEditorField = ({ category, products, ...rest }) => {
+  const save = useCallback(name => {
+    for (const product of products)
+      database.ref(`/products/${product.id}/category`).set(name).catch(() => { })
+  }, [category, products])
+  return <EditorField {...rest} value={category} onSave={save} immediate={false} />
+}
+
+const categorize = products => {
+  products = Object.entries<any>(products).map(([k, v]) => (v.id = k, v))
+  const categories = products.reduce((acc, v) => ((acc[v.category] ? acc[v.category].push(v) : (acc[v.category] = [v])), acc), {}) as any
+  for (const k in categories)
+    categories[k] = categories[k].sort((a, b) => a.name > b.name ? 1 : -1)
+  return Object.fromEntries(Object.entries(categories).sort((a, b) => a[0] > b[0] ? 1 : -1)) as any
+}
+
+const addProduct = (category?) => () => {
+  if (!category) {
+    category = prompt('Введите категорию продукта')
+    if (!category) return
+  }
+  database.ref('products').push({ category })
+}
 
 export default () => {
   const admin = useSelector(adminSelector)
+  const [edit, toggleEdit] = useToggle(false)
   const [products, setProducts] = useState([])
-  useEffect(() => subscribe(database.ref('products'), 'value', snap => setProducts(categorize(Object.entries<any>(snap.val()).map(([k, v]) => (v.id = k, v))))), [])
+  useEffect(() => subscribe(database.ref('products'), 'value', snap => setProducts(categorize(snap.val()))), [])
 
   return (
     <Root>
-      <Typography variant="h4">Каталог</Typography>
+      <PageTitle>
+        Каталог
+        {admin && <button style={{ float: 'right' }} onClick={toggleEdit}>{edit ? '💾' : '✏️'}</button>}
+        {edit && <button style={{ float: 'right' }} onClick={addProduct()}>➕</button>}
+      </PageTitle>
       <Table>
         <thead>
           <tr>
@@ -109,8 +144,9 @@ export default () => {
             <td><Typography>Цена</Typography></td>
             <td><Typography>Единица измерения</Typography></td>
             <td><Typography>Комментарий</Typography></td>
-            <td><Typography>В корзину</Typography></td>
             {admin && <td><Typography>Внутренний комментарий</Typography></td>}
+            {!edit && <td><Typography>В корзину</Typography></td>}
+            {edit && <td></td>}
           </tr>
         </thead>
         <tbody>
@@ -118,13 +154,16 @@ export default () => {
             <React.Fragment key={category}>
               <tr className="category"><td colSpan={100}>
                 <Typography variant="h5">
-                  {category}
+                  <CategoryEditorField category={category} products={products} enabled={edit} />
+                  {edit && <button style={{ float: 'right' }} onClick={addProduct(category)}>➕</button>}
                 </Typography>
               </td></tr>
               {products.map((p, i) => <Product
                 key={p.id}
                 model={p}
                 darker={i % 2}
+                admin={admin}
+                edit={edit}
               />)}
             </React.Fragment>
           )}

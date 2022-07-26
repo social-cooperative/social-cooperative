@@ -63,6 +63,7 @@ const dateRuConfig = {
 } as any
 
 import { Order } from './Orders'
+import PageTitle from './PageTitle'
 
 const sortByDate = ([ka, a], [kb, b]) => b.date - a.date
 
@@ -79,7 +80,7 @@ export const Orders = ({ orders = {} }) => {
   }, [orders])
   return (
     <Root>
-      <Typography variant="h4">Закупка</Typography>
+      <PageTitle>Закупка</PageTitle>
       <Table>
         <thead>
           <tr>
@@ -94,11 +95,11 @@ export const Orders = ({ orders = {} }) => {
           {Object.entries<any>(orders).sort(sortByDate).map(([id, orders]) =>
             <React.Fragment key={id}>
               <tr className="category">
-                <td colSpan={100} style={{ background: '#aaaaaa' }}>
+                <td colSpan={100} style={{ background: '#bae5c6' }}>
                   <Typography variant="h5">
                     Пользователь <b>{Object.values<any>(orders)[0]?.phone}</b>,
                     заказов: {Object.values(orders).length},
-                    на сумму: {ru.format(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}
+                    на сумму: <b>{ru.format(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}</b>
                   </Typography>
                 </td>
               </tr>

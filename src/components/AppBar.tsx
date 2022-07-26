@@ -26,7 +26,7 @@ import { useTheme } from '@mui/material/styles'
 
 const AppToolbar = styled(Toolbar)`
   backdrop-filter: blur(8px);
-  background: rgba(204, 204, 204, 0.8);
+  background: rgba(231, 247, 235, 0.8);
   top: 0;
 `
 

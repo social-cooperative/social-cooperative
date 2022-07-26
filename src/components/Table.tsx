@@ -15,7 +15,6 @@ export const Table = styled.table`
   border-collapse: collapse;
   width: 100%;
   & td:not(:first-child) {
-    //border-left: 1px solid #888888;
   }
   
   & td.image {
@@ -27,7 +26,7 @@ export const Table = styled.table`
   
   & .category td {
     padding: 1em;
-    background: #cccccc;
+    background: #d7f5df;
     text-align: center;
   }
   

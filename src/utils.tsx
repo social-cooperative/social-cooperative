@@ -449,7 +449,7 @@ export function useRedux(selector = identity, comparator = shallowEqual) {
 export const useInputState = (initialState = undefined) => {
   const [value, setValue] = useState(initialState)
   const setOnChange = useCallback(event => setValue(event.target.value), [])
-  return [value, setOnChange]
+  return [value, setOnChange, setValue]
 }
 
 export const unsubs = () => {
@@ -523,7 +523,6 @@ export const hash = str => {
 
 
 export const productsTotal = products => {
-  console.log(products)
   if (!(products && typeof products === 'object'))
     return 0
   if (products.count && products.product?.price)

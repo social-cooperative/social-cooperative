@@ -23,7 +23,7 @@ const Product = props => {
   const { model } = props
   const total = productsTotal(model)
   return (
-    <tr className="product" style={{ background: props.darker ? '#eeeeee' : undefined }}>
+    <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
       <td>
         <Typography title={model.product.comment}>
           {model.product.name} <small>({model.product.category})</small>
@@ -54,6 +54,7 @@ const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
 import { log, productsTotal, subscribe, useCounter, useSelector, useToggle } from '../utils'
 import { useCallback, useEffect, useState } from 'react'
+import PageTitle from './PageTitle'
 
 export default () => {
   const [orders, setOrders] = useState({})
@@ -86,7 +87,7 @@ export const Order = ({ order, id }) => {
   return <>
     <tr className="category">
       <td colSpan={100}>
-        <Typography variant="h5">
+        <Typography variant="h6">
           Заказ от <b>{orderedAt}</b> на сумму <b>{ru.format(total)}</b>
         </Typography>
       </td>
@@ -104,7 +105,7 @@ const sortByDate = ([ka, a], [kb, b]) => b.date - a.date
 export const Orders = ({ orders = {}, ordersHistory = {} }) => {
   return (
     <Root>
-      <Typography variant="h4">Текущие заказы</Typography>
+      <PageTitle>Текущие заказы</PageTitle>
       <Table>
         <thead>
           <tr>
@@ -127,7 +128,7 @@ export const Orders = ({ orders = {}, ordersHistory = {} }) => {
         </tbody>
       </Table>
 
-      <Typography variant="h4" sx={{ marginTop: '1em' }}>Исполенные заказы</Typography>
+      <PageTitle sx={{ marginTop: '1em' }}>Исполенные заказы</PageTitle>
       <Table>
         <thead>
           <tr>

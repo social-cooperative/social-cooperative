@@ -45,7 +45,7 @@ const Product = props => {
   }), [model])
 
   return (
-    <tr className="product" style={{ background: props.darker ? '#eeeeee' : undefined }}>
+    <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
       <td className="image">
         <FirebaseImageUploader src={model.product.image} enabled={false} component={CellImg} />
       </td><td>
@@ -89,6 +89,7 @@ import FirebaseEditorField from './FirebaseEditorField'
 import FirebaseImageUploader from './FirebaseImageUploader'
 import { AnyRecord } from 'dns'
 import products from '../products'
+import PageTitle from './PageTitle'
 
 const categorize = products => products.reduce((acc, v) => ((acc[v.product.category] ? acc[v.product.category].push(v) : (acc[v.product.category] = [v])), acc), {}) as any
 
@@ -127,7 +128,7 @@ export const Cart = ({ products = {} }) => {
 
   return (
     <Root>
-      <Typography variant="h4">Корзина</Typography>
+      <PageTitle>Корзина</PageTitle>
       <Table>
         <thead>
           <tr>
