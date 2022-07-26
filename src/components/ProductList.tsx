@@ -19,6 +19,8 @@ const Root = styled.div`
 
 const adminSelector = store => !!store.claims.admin
 
+export const productSlug = model => model.id + '|' + hash(model.name + model.unit + model.price)
+
 const Product = props => {
   const [editing, toggleEditing] = useToggle(false)
   const admin = useSelector(adminSelector)
@@ -26,7 +28,7 @@ const Product = props => {
   const { model } = props
 
   const addToBasket = useCallback(() => {
-    const slug = model.id + '|' + hash(model.name + model.unit + model.price)
+    const slug = productSlug(model)
 
     const cartRef = database.ref(`carts/${auth.currentUser.uid}`)
 

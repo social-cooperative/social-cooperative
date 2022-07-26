@@ -208,6 +208,11 @@ export const subscribe = (
   return () => unsubbers.forEach(call)
 }
 
+export const subscribeOnce = (emitter: TinyEventEmitter, event: string, func: Listener) => {
+  emitter.once(event, func)
+  return () => emitter.off(event, func)
+}
+
 export const once = (
   emitter: TinyEventEmitter,
   event: string,

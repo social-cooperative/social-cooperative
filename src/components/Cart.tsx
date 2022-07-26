@@ -11,6 +11,8 @@ import styled from 'styled-components'
 
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
+import { productSlug } from './ProductList'
+import { subscribeOnce } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
@@ -18,12 +20,33 @@ const Root = styled.div`
 
 const adminSelector = store => !!store.claims.admin
 
+const productChangedMessage = 'Информация об этом продукте была изменена, но за вами сохранено право приобрести то количество которое вы уже добавили в корзину.'
+
 const Product = props => {
   const { model } = props
-  const [editing, toggleEditing] = useToggle(false)
-  const admin = useSelector(adminSelector)
-  const [count, setCount, incCount, decCount] = useCounter(1, 1)
+  const slug = productSlug(model.product)
+  const [frozen, setFrozen] = useState(false)
+  useEffect(() => {
+    setFrozen(true)
+    return subscribe(database.ref(`/products/${model.product.id}`), 'value', snap => {
+      const product = snap.val()
+      if (!product) return
+      product.id = model.product.id
+      const currentSlug = productSlug(product)
+      console.log(slug, currentSlug)
+      if (slug === currentSlug) setFrozen(false)
+      else setFrozen(true)
+    })
+  }, [slug])
   const deleteFromCart = () => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).set(null)
+  const incCount = useCallback(() => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).update({
+    count: model.count + 1,
+    total: (model.count + 1) * model.product.price,
+  }), [model])
+  const decCount = useCallback(() => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).update({
+    count: Math.max(model.count - 1, 1),
+    total: Math.max(model.count - 1, 1) * model.product.price,
+  }), [model])
 
   return (
     <tr className="product" style={{ background: props.darker ? '#eeeeee' : undefined }}>
@@ -50,9 +73,12 @@ const Product = props => {
           {String(model.total).replace('.', ',') + 'р.'}
         </Typography>
       </td><td>
-        <Typography>
+        <Typography component="div" style={{ display: 'flex' }}>
+          <button style={{ width: 25 }} onClick={incCount} disabled={frozen}>+</button>
+          <button style={{ width: 25 }} onClick={decCount} disabled={frozen || model.count <= 1}>-</button>
           <button disabled={props.disabled} onClick={deleteFromCart}>Удалить</button>
         </Typography>
+        {frozen && <div style={{ width: 128, textAlign: 'justify' }}>{productChangedMessage}</div>}
       </td>
     </tr>
   )
@@ -61,11 +87,12 @@ const Product = props => {
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
-import { log, subscribe, useCounter, useSelector, useToggle } from '../utils'
+import { log, once, subscribe, useCounter, useSelector, useToggle } from '../utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import FirebaseEditorField from './FirebaseEditorField'
 import FirebaseImageUploader from './FirebaseImageUploader'
 import { AnyRecord } from 'dns'
+import products from '../products'
 
 const categorize = products => products.reduce((acc, v) => ((acc[v.product.category] ? acc[v.product.category].push(v) : (acc[v.product.category] = [v])), acc), {}) as any
 
