@@ -9,7 +9,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import SkipNextIcon from '@mui/icons-material/SkipNext'
 import styled from 'styled-components'
 
-import { auth, database } from '../firebase'
+import { auth, database, storage } from '../firebase'
 import { Table, CellImg } from './Table'
 
 const Root = styled.div`
@@ -26,8 +26,10 @@ const Product = props => {
   const { model, edit, admin } = props
 
   const deleteProduct = useCallback(() => {
-    if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`))
+    if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`)) {
+      storage.ref(model.image).delete().catch(() => { })
       database.ref(`products/${model.id}`).set(null).catch(() => { })
+    }
   }, [model])
 
   const addToBasket = useCallback(() => {
