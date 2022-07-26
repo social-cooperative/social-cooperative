@@ -19,7 +19,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale'
 import Badge from '@mui/material/Badge'
 
-import { log, subscribe, useSelector } from '../utils'
+import { log, productsTotal, subscribe, useSelector } from '../utils'
 import { auth, database, logoutAndReload } from '../firebase'
 import { useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
@@ -47,7 +47,7 @@ const CartValue = () => {
     'value',
     snap => setCart(snap.val() || {})
   ), [])
-  const total = Object.values<any>(cart).reduce((acc, v) => acc += v.total, 0)
+  const total = productsTotal(cart)
   return ru.format(total) as any
 }
 
@@ -62,7 +62,8 @@ const useProcurement = () => {
   let count = 0
   for (const id in orders)
     for (const id2 in orders[id]) {
-      total += orders[id][id2].total
+      orders[id][id2]
+      total += productsTotal(orders[id][id2].products)
       count++
     }
   return [total, count] as any

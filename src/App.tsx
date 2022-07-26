@@ -68,7 +68,7 @@ import Procurement from './components/Procurement'
 const Pathnames = () => {
   const pathname = location.pathname.slice(1)
 
-  switch (log(pathname)) {
+  switch (pathname) {
     case 'cart': return <Cart />
     case 'orders': return <Orders />
     case 'procurement': return <Procurement />

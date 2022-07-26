@@ -21,6 +21,7 @@ const adminSelector = store => !!store.claims.admin
 
 const Product = props => {
   const { model } = props
+  const total = productsTotal(model)
   return (
     <tr className="product" style={{ background: props.darker ? '#eeeeee' : undefined }}>
       <td>
@@ -41,7 +42,7 @@ const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {String(model.total).replace('.', ',') + 'р.'}
+          {String(total).replace('.', ',') + 'р.'}
         </Typography>
       </td>
     </tr>
@@ -51,7 +52,7 @@ const Product = props => {
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
-import { log, subscribe, useCounter, useSelector, useToggle } from '../utils'
+import { log, productsTotal, subscribe, useCounter, useSelector, useToggle } from '../utils'
 import { useCallback, useEffect, useState } from 'react'
 
 export default () => {
@@ -79,7 +80,8 @@ const dateRuConfig = {
 } as any
 
 export const Order = ({ order, id }) => {
-  const { products, date, total } = order
+  const { products, date } = order
+  const total = productsTotal(products)
   const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
   return <>
     <tr className="category">

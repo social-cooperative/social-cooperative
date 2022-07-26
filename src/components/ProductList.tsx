@@ -22,7 +22,6 @@ const adminSelector = store => !!store.claims.admin
 export const productSlug = model => model.id + '|' + hash(model.name + model.unit + model.price)
 
 const Product = props => {
-  const [editing, toggleEditing] = useToggle(false)
   const admin = useSelector(adminSelector)
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
   const { model } = props
@@ -36,13 +35,11 @@ const Product = props => {
       const inCart = snap.val()
       if (inCart) {
         inCart.count += count
-        inCart.total += count * model.price
         cartRef.child(slug).set(inCart)
       } else {
         cartRef.child(slug).set({
           product: model,
           count: count,
-          total: count * model.price,
         })
       }
     })

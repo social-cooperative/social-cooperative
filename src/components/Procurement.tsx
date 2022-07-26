@@ -21,39 +21,9 @@ const Root = styled.div`
 
 const adminSelector = store => !!store.claims.admin
 
-const Product = props => {
-  const { model } = props
-  return (
-    <tr className="product" style={{ background: props.darker ? '#eeeeee' : undefined }}>
-      <td>
-        <Typography title={model.product.comment}>
-          {model.product.name} <small>({model.product.category})</small>
-        </Typography>
-      </td><td>
-        <Typography>
-          {model.product.unit}
-        </Typography>
-      </td><td>
-        <Typography>
-          {model.product.price ? String(model.product.price).replace('.', ',') + 'р.' : '-'}
-        </Typography>
-      </td><td>
-        <Typography>
-          x{model.count}
-        </Typography>
-      </td><td>
-        <Typography>
-          {String(model.total).replace('.', ',') + 'р.'}
-        </Typography>
-      </td>
-    </tr>
-  )
-}
-
-
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
-import { log, subscribe, useCounter, useSelector, useToggle } from '../utils'
+import { log, productsTotal, subscribe, useCounter, useSelector, useToggle } from '../utils'
 import { useCallback, useEffect, useState } from 'react'
 
 const useProcurement = () => {
@@ -67,7 +37,7 @@ const useProcurement = () => {
   let count = 0
   for (const id in orders)
     for (const id2 in orders[id]) {
-      total += orders[id][id2].total
+      total += productsTotal(orders[id][id2].products)
       count++
     }
   return [total, count] as any
@@ -92,24 +62,7 @@ const dateRuConfig = {
   minute: '2-digit'
 } as any
 
-export const Order = ({ order, id }) => {
-  const { products, date, total } = order
-  const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
-  return <>
-    <tr className="category">
-      <td colSpan={100}>
-        <Typography>
-          Заказ от <b>{orderedAt}</b> на сумму <b>{ru.format(total)}</b>
-        </Typography>
-      </td>
-    </tr>
-    {Object.entries<any>(products).map(([id, p], i) => <Product
-      key={id}
-      model={p}
-      darker={i % 2}
-    />)}
-  </>
-}
+import { Order } from './Orders'
 
 const sortByDate = ([ka, a], [kb, b]) => b.date - a.date
 
@@ -145,7 +98,7 @@ export const Orders = ({ orders = {} }) => {
                   <Typography variant="h5">
                     Пользователь <b>{Object.values<any>(orders)[0]?.phone}</b>,
                     заказов: {Object.values(orders).length},
-                    на сумму: {ru.format(Object.values<any>(orders).reduce((acc, v) => acc += v.total, 0))}
+                    на сумму: {ru.format(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}
                   </Typography>
                 </td>
               </tr>

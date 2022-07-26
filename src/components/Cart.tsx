@@ -12,18 +12,17 @@ import styled from 'styled-components'
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { productSlug } from './ProductList'
-import { subscribeOnce } from '../utils'
+import { productsTotal, subscribeOnce } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
 `
 
-const adminSelector = store => !!store.claims.admin
-
 const productChangedMessage = 'Информация об этом продукте была изменена, но за вами сохранено право приобрести то количество которое вы уже добавили в корзину.'
 
 const Product = props => {
   const { model } = props
+  const total = productsTotal(model)
   const slug = productSlug(model.product)
   const [frozen, setFrozen] = useState(false)
   useEffect(() => {
@@ -33,7 +32,6 @@ const Product = props => {
       if (!product) return
       product.id = model.product.id
       const currentSlug = productSlug(product)
-      console.log(slug, currentSlug)
       if (slug === currentSlug) setFrozen(false)
       else setFrozen(true)
     })
@@ -41,11 +39,9 @@ const Product = props => {
   const deleteFromCart = () => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).set(null)
   const incCount = useCallback(() => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).update({
     count: model.count + 1,
-    total: (model.count + 1) * model.product.price,
   }), [model])
   const decCount = useCallback(() => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).update({
     count: Math.max(model.count - 1, 1),
-    total: Math.max(model.count - 1, 1) * model.product.price,
   }), [model])
 
   return (
@@ -70,7 +66,7 @@ const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {String(model.total).replace('.', ',') + 'р.'}
+          {String(total).replace('.', ',') + 'р.'}
         </Typography>
       </td><td>
         <Typography component="div" style={{ display: 'flex' }}>
@@ -117,13 +113,12 @@ export const Cart = ({ products = {} }) => {
     setCategories(categorize(Object.entries<any>(products).map(([k, v]) => (v.id = k, v))))
   }, [products])
 
-  const total = Object.values<any>(products).reduce((acc, v) => acc += v.total, 0)
+  const total = productsTotal(products)
 
   const placeOrder = useCallback(() => {
     database.ref(`orders/${auth.currentUser.uid}`).push({
       products,
       date: firebase.database.ServerValue.TIMESTAMP,
-      total,
       uid: auth.currentUser.uid,
       phone: auth.currentUser.phoneNumber,
     })
