@@ -27,7 +27,7 @@ const Product = props => {
 
   const deleteProduct = useCallback(() => {
     if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`)) {
-      storage.ref(model.image).delete().catch(() => { })
+      if (model.image) storage.ref(model.image).delete().catch(() => { })
       database.ref(`products/${model.id}`).set(null).catch(() => { })
     }
   }, [model])
