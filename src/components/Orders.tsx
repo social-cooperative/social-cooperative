@@ -19,7 +19,7 @@ const Root = styled.div`
 
 const adminSelector = store => !!store.claims.admin
 
-const Product = props => {
+export const Product = props => {
   const { model } = props
   const total = productsTotal(model)
   return (
@@ -90,6 +90,15 @@ export const Order = ({ order, id }) => {
         <Typography variant="h6">
           Заказ от <b>{orderedAt}</b> на сумму <b>{ru.format(total)}</b>
         </Typography>
+        {!!order.name && <Typography align="left">
+          {order.name}
+        </Typography>}
+        {!!order.address && <Typography align="left">
+          {order.address}
+        </Typography>}
+        {!!order.comment && <Typography align="left">
+          {order.comment}
+        </Typography>}
       </td>
     </tr>
     {Object.entries<any>(products).map(([id, p], i) => <Product
@@ -110,7 +119,7 @@ export const Orders = ({ orders = {}, ordersHistory = {} }) => {
         <thead>
           <tr>
             <td><Typography>Наименование</Typography></td>
-            <td><Typography>Единица измерения</Typography></td>
+            <td><Typography>Ед. изм.</Typography></td>
             <td><Typography>Цена</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>
@@ -133,7 +142,7 @@ export const Orders = ({ orders = {}, ordersHistory = {} }) => {
         <thead>
           <tr>
             <td><Typography>Наименование</Typography></td>
-            <td><Typography>Единица измерения</Typography></td>
+            <td><Typography>Ед. изм.</Typography></td>
             <td><Typography>Цена</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>

@@ -65,13 +65,17 @@ import UserMenu from './components/UserMenu'
 import Orders from './components/Orders'
 import Procurement from './components/Procurement'
 
+
+const adminSelector = store => !!store.claims.admin
+
 const Pathnames = () => {
   const pathname = location.pathname.slice(1)
+  const admin = useSelector(adminSelector)
 
   switch (pathname) {
     case 'cart': return <Cart />
     case 'orders': return <Orders />
-    case 'procurement': return <Procurement />
+    case 'procurement': return admin ? <Procurement /> : <ProductList />
     default: return <>
       <ProductList />
     </>

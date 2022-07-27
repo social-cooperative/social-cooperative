@@ -109,7 +109,7 @@ const CategoryEditorField = ({ category, products, ...rest }) => {
   return <EditorField {...rest} value={category} onSave={save} immediate={false} />
 }
 
-const categorize = products => {
+export const categorize = products => {
   products = Object.entries<any>(products).map(([k, v]) => (v.id = k, v))
   const categories = products.reduce((acc, v) => ((acc[v.category] ? acc[v.category].push(v) : (acc[v.category] = [v])), acc), {}) as any
   for (const k in categories)
@@ -144,7 +144,7 @@ export default () => {
             <td><Typography>Фото</Typography></td>
             <td><Typography>Наименование</Typography></td>
             <td><Typography>Цена</Typography></td>
-            <td><Typography>Единица измерения</Typography></td>
+            <td><Typography>Ед. изм.</Typography></td>
             <td><Typography>Комментарий</Typography></td>
             {admin && <td><Typography>Внутренний комментарий</Typography></td>}
             {!edit && <td><Typography>В корзину</Typography></td>}

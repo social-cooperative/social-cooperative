@@ -446,7 +446,7 @@ export function useRedux(selector = identity, comparator = shallowEqual) {
   return [useSelector(selector, comparator), useDispatch()]
 }
 
-export const useInputState = (initialState = undefined) => {
+export const useInputState = (initialState = '') => {
   const [value, setValue] = useState(initialState)
   const setOnChange = useCallback(event => setValue(event.target.value), [])
   return [value, setOnChange, setValue]

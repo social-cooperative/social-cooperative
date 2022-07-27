@@ -12,7 +12,7 @@ import styled from 'styled-components'
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { productSlug } from './ProductList'
-import { productsTotal, subscribeOnce } from '../utils'
+import { productsTotal, subscribeOnce, useInputState } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
@@ -105,10 +105,19 @@ export default () => {
 
 }
 
-
 export const Cart = ({ products = {} }) => {
   const [categories, setCategories] = useState({})
   const [ordered, toggleOrdered] = useToggle(false)
+
+  const [name, setName, setNameRaw] = useInputState()
+  const [address, setAddress, setAddressRaw] = useInputState()
+  const [comment, setComment] = useInputState()
+
+  useEffect(() => subscribe(database.ref(`users/${auth.currentUser.uid}`), 'value', snap => {
+    const user = snap.val()
+    setNameRaw(user.name || '')
+    setAddressRaw(user.address || '')
+  }), [])
 
   useEffect(() => {
     setCategories(categorize(Object.entries<any>(products).map(([k, v]) => (v.id = k, v))))
@@ -122,9 +131,16 @@ export const Cart = ({ products = {} }) => {
       date: firebase.database.ServerValue.TIMESTAMP,
       uid: auth.currentUser.uid,
       phone: auth.currentUser.phoneNumber,
+      name,
+      address,
+      comment,
+    })
+    database.ref(`users/${auth.currentUser.uid}`).update({
+      name,
+      address,
     })
     database.ref(`carts/${auth.currentUser.uid}`).set(null)
-  }, [products, total])
+  }, [products, name, address, comment])
 
   return (
     <Root>
@@ -134,7 +150,7 @@ export const Cart = ({ products = {} }) => {
           <tr>
             <td><Typography>Фото</Typography></td>
             <td><Typography>Наименование</Typography></td>
-            <td><Typography>Единица измерения</Typography></td>
+            <td><Typography>Ед. изм.</Typography></td>
             <td><Typography>Цена</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>
@@ -164,9 +180,18 @@ export const Cart = ({ products = {} }) => {
             : <>
               <tr className="category no-center">
                 <td colSpan={100}>
-                  <button onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
-                    <Typography variant="h5">{ordered ? 'Отменить заказ' : 'Заказать на сумму ' + ru.format(total)}</Typography>
-                  </button>
+                  <Typography variant="h5">
+                    <div style={{ display: 'flex', marginBottom: '0.5em' }}>
+                      <input placeholder="Ф.И.О." value={name} onChange={setName} style={{ flex: 1, marginRight: '0.5em' }} />
+                      <input placeholder="Адрес" value={address} onChange={setAddress} style={{ flex: 1 }} />
+                    </div>
+                    <div style={{ display: 'flex', marginBottom: '0.5em' }}>
+                      <input placeholder="Комментарий к заказу" value={comment} onChange={setComment} style={{ flex: 1 }} />
+                    </div>
+                    <button disabled={!(name && address)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
+                      {ordered ? 'Отменить заказ' : 'Заказать на сумму ' + ru.format(total)}
+                    </button>
+                  </Typography>
                 </td>
               </tr>
             </>

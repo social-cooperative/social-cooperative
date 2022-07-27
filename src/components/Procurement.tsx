@@ -64,11 +64,68 @@ const dateRuConfig = {
 
 import { Order } from './Orders'
 import PageTitle from './PageTitle'
+import { categorize } from './ProductList'
+
+
+
+const useProducts = orders => {
+  const users = Object.values<any>(orders)
+  const products = {}
+
+  for (const user of users) {
+    for (const orderId in user) {
+      const order = user[orderId]
+      for (const slug in order.products) {
+        if (products[slug])
+          products[slug].count += order.products[slug].count
+        else
+          products[slug] = { ...order.products[slug], ...order.products[slug].product }
+      }
+    }
+  }
+  const categories = categorize(products)
+  for (const category in categories) {
+    categories[category] = {
+      products: categories[category],
+      total: productsTotal(categories[category])
+    }
+  }
+  return categories
+}
+
+const ByProductProduct = ({ product, darker }) => (
+  <tr style={{ background: darker ? '#E7F7EB' : undefined }}>
+    <td><Typography>{product.name}</Typography></td>
+    <td><Typography>{product.unit}</Typography></td>
+    <td><Typography>{product.price}</Typography></td>
+    <td><Typography>{product.unit} x{product.count}</Typography></td>
+    <td><Typography>{product.price * product.count}р.</Typography></td>
+  </tr>
+)
+
+const ByProducts = ({ orders }) => {
+  const products = useProducts(orders)
+  return <>{
+    Object.entries<any>(products).map(([category, { products, total }]) =>
+      <React.Fragment key={category}>
+        <tr className="category">
+          <td colSpan={100} style={{ background: '#bae5c6' }}>
+            <Typography variant="h6">{category}, всего на <b>{ru.format(total)}</b></Typography>
+          </td>
+        </tr>
+        {products.map((product, i) =>
+          <ByProductProduct key={product.id} product={product} darker={i % 2} />
+        )}
+      </React.Fragment>
+    )
+  }</>
+}
 
 const sortByDate = ([ka, a], [kb, b]) => b.date - a.date
 
 export const Orders = ({ orders = {} }) => {
-  let [total, count] = useProcurement()
+  const [byProducts, toggleByProducts] = useToggle(false)
+  const [total, count] = useProcurement()
   const finishProcurement = useCallback(() => {
     const procured = Date.now()
     Promise.all(Object.entries<any>(orders).map(([uid, order]) => {
@@ -80,34 +137,40 @@ export const Orders = ({ orders = {} }) => {
   }, [orders])
   return (
     <Root>
-      <PageTitle>Закупка</PageTitle>
+      <PageTitle>
+        Закупка
+        <button style={{ float: 'right' }} onClick={toggleByProducts}>{byProducts ? 'По клиентам' : 'По продуктам'}</button>
+      </PageTitle>
       <Table>
         <thead>
           <tr>
             <td><Typography>Наименование</Typography></td>
-            <td><Typography>Единица измерения</Typography></td>
+            <td><Typography>Ед. изм.</Typography></td>
             <td><Typography>Цена</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>
           </tr>
         </thead>
         <tbody>
-          {Object.entries<any>(orders).sort(sortByDate).map(([id, orders]) =>
-            <React.Fragment key={id}>
-              <tr className="category">
-                <td colSpan={100} style={{ background: '#bae5c6' }}>
-                  <Typography variant="h5">
-                    Пользователь <b>{Object.values<any>(orders)[0]?.phone}</b>,
-                    заказов: {Object.values(orders).length},
-                    на сумму: <b>{ru.format(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}</b>
-                  </Typography>
-                </td>
-              </tr>
-              {Object.entries<any>(orders).sort(sortByDate).map(([id, order]) =>
-                <Order key={id} id={id} order={order} />
-              )}
-            </React.Fragment>
-          )}
+          {byProducts
+            ? <ByProducts orders={orders} />
+            : Object.entries<any>(orders).sort(sortByDate).map(([id, orders]) =>
+              <React.Fragment key={id}>
+                <tr className="category">
+                  <td colSpan={100} style={{ background: '#bae5c6' }}>
+                    <Typography variant="h5">
+                      Пользователь <b>{Object.values<any>(orders)[0]?.phone}</b>,
+                      заказов: {Object.values(orders).length},
+                      на сумму: <b>{ru.format(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}</b>
+                    </Typography>
+                  </td>
+                </tr>
+                {Object.entries<any>(orders).sort(sortByDate).map(([id, order]) =>
+                  <Order key={id} id={id} order={order} />
+                )}
+              </React.Fragment>
+            )
+          }
           {!Object.entries<any>(orders).length
             ?
             <tr><td colSpan={100}>
@@ -122,8 +185,6 @@ export const Orders = ({ orders = {} }) => {
               </td>
             </tr>
           }
-
-
         </tbody>
       </Table>
     </Root>

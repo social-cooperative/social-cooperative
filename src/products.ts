@@ -8,7 +8,7 @@ const transform = a => a.split('\n').map(v => v.split('\t')).map((v, i, a) => Ob
   unit: v['Ед. измерения '],
   comment: v['Комменатрий для пайщика'],
   commentInternal: v['Комменатрий для нас'],
-  priceOnMarker: num(v['Цена в ФудСити']),
+  priceOnMarket: num(v['Цена в ФудСити']),
   priceRetail: num(v['В сетевом магазине ']),
 })).slice(1)
 
@@ -77,4 +77,4 @@ export default transform(raw)
 
 import { database } from './firebase'
 
-Promise.all(transform(raw).map(v => database.ref('/products').push(v).then(v => v))).then(console.log)
+//Promise.all(transform(raw).map(v => database.ref('/products').push(v).then(v => v))).then(console.log)
