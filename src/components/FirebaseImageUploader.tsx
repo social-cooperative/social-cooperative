@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 
 import { storage, database } from '../firebase'
@@ -14,6 +14,8 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
   const directSrc = src?.startsWith?.('https://')
   const [path, setPath] = useState(src ? (directSrc ? src : '/loading.gif') : '/noimage.png')
   const inputRef = useRef<any>()
+
+  const clickFileInput = useCallback(() => inputRef.current?.click?.(), [])
 
   const finalSrc = directSrc ? src : path
 
@@ -45,7 +47,7 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
   return (
     enabled
       ? <>
-        <Component src={finalSrc} /*onDoubleClick*/onClick={() => inputRef.current?.click?.()} />
+        <Component src={finalSrc} onDoubleClick={clickFileInput} onTouchStart={clickFileInput} />
         <input type="file" ref={inputRef} accept="image/png, image/jpeg" onChange={upload} style={{ display: 'none' }} />
       </>
       : <Component src={finalSrc} />

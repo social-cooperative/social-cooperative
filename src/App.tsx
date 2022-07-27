@@ -57,6 +57,7 @@ import AuthShield from './components/AuthShield'
 const logoutAndReload = () => logout().then(() => location.reload())
 
 import { database } from './firebase'
+import packageInfo from '../package.json'
 
 import ProductList from './components/ProductList'
 import Cart from './components/Cart'
@@ -83,6 +84,13 @@ const Pathnames = () => {
 
 }
 
+const Version = styled.div`
+  color: rgba(128,128,128,0.2);
+  font-size: small;
+  text-align: center;
+  margin: 1rem 0 2rem 0;
+`
+
 export default function App() {
 
   return (
@@ -94,6 +102,7 @@ export default function App() {
         <UserMenu />
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <Pathnames />
+          <Version>СоцКооп версия {packageInfo.version}</Version>
         </div>
       </AuthShield>
     </Provider>

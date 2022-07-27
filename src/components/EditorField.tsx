@@ -42,7 +42,7 @@ export const EditorField = ({ chidlren = defaultRender, value, enabled = true, n
       onBlur={stopEditing}
       autoFocus
     />
-    : <span /*onDoubleClick*/onClick={startEditing}>{chidlren(innerValue)}</span>
+    : <span onDoubleClick={startEditing} onTouchStart={startEditing}>{chidlren(innerValue)}</span>
 }
 
 export default EditorField
