@@ -45,7 +45,7 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
   return (
     enabled
       ? <>
-        <Component src={finalSrc} onDoubleClick={() => inputRef.current?.click?.()} />
+        <Component src={finalSrc} /*onDoubleClick*/onClick={() => inputRef.current?.click?.()} />
         <input type="file" ref={inputRef} accept="image/png, image/jpeg" onChange={upload} style={{ display: 'none' }} />
       </>
       : <Component src={finalSrc} />
