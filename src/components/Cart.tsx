@@ -21,11 +21,12 @@ const Root = styled.div`
 const productChangedMessage = 'Информация об этом продукте была изменена, но за вами сохранено право приобрести то количество которое вы уже добавили в корзину.'
 
 const Product = props => {
-  const { model } = props
+  const { model, simple } = props
   const total = productsTotal(model)
-  const slug = productSlug(model.product)
+  const slug = simple ? '' : productSlug(model.product)
   const [frozen, setFrozen] = useState(false)
   useEffect(() => {
+    if (simple) return
     setFrozen(true)
     return subscribe(database.ref(`/products/${model.product.id}`), 'value', snap => {
       const product = snap.val()
@@ -35,7 +36,7 @@ const Product = props => {
       if (slug === currentSlug) setFrozen(false)
       else setFrozen(true)
     })
-  }, [slug])
+  }, [slug, simple])
   const deleteFromCart = () => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).set(null)
   const incCount = useCallback(() => database.ref(`/carts/${auth.currentUser.uid}/${model.id}`).update({
     count: model.count + 1,
@@ -47,7 +48,7 @@ const Product = props => {
   return (
     <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
       <td className="image">
-        <FirebaseImageUploader src={model.product.image} enabled={false} component={CellImg} />
+        {simple || <FirebaseImageUploader src={model.product.image} enabled={false} component={CellImg} />}
       </td><td>
         <Typography variant="h6" title={model.product.comment}>
           {model.product.name}
@@ -68,14 +69,14 @@ const Product = props => {
         <Typography>
           {String(total).replace('.', ',') + 'р.'}
         </Typography>
-      </td><td>
+      </td>{simple ? <td /> : <td>
         <Typography component="div" style={{ display: 'flex' }}>
           <button style={{ width: 25 }} onClick={incCount} disabled={frozen}>+</button>
           <button style={{ width: 25 }} onClick={decCount} disabled={frozen || model.count <= 1}>-</button>
-          <button disabled={props.disabled} onClick={deleteFromCart}>Удалить</button>
+          <button onClick={deleteFromCart}>Удалить</button>
         </Typography>
         {frozen && <div style={{ width: 128, textAlign: 'justify' }}>{productChangedMessage}</div>}
-      </td>
+      </td>}
     </tr>
   )
 }
@@ -107,7 +108,6 @@ export default () => {
 
 export const Cart = ({ products = {} }) => {
   const [categories, setCategories] = useState({})
-  const [ordered, toggleOrdered] = useToggle(false)
 
   const [name, setName, setNameRaw] = useInputState()
   const [address, setAddress, setAddressRaw] = useInputState()
@@ -123,11 +123,14 @@ export const Cart = ({ products = {} }) => {
     setCategories(categorize(Object.entries<any>(products).map(([k, v]) => (v.id = k, v))))
   }, [products])
 
+  const productCount = Object.entries(products).length
+
   const total = productsTotal(products)
+  const totalWithExpenses = total + Math.floor(total * 0.15)
 
   const placeOrder = useCallback(() => {
     database.ref(`orders/${auth.currentUser.uid}`).push({
-      products,
+      products: { ...products, ['expenses|' + Date.now() + String(Math.random()).slice(2)]: { product: { name: 'Организационные расходы', category: 'ФОНД', price: Math.floor(total * 0.15), unit: '15%' }, count: 1 } },
       date: firebase.database.ServerValue.TIMESTAMP,
       uid: auth.currentUser.uid,
       phone: auth.currentUser.phoneNumber,
@@ -169,13 +172,17 @@ export const Cart = ({ products = {} }) => {
                 key={p.id}
                 model={p}
                 darker={i % 2}
-                disabled={ordered}
               />)}
             </React.Fragment>
           )}
-          {!Object.entries(products).length
+
+          {!!productCount &&
+            <Product simple darker={productCount % 2} model={{ product: { name: 'Организационные расходы', price: Math.floor(total * 0.15), unit: '15%' }, count: 1 }} />
+          }
+          {!productCount
             ? <tr><td colSpan={100}>
               <Typography variant="h6" align="center">Ваша корзина пуста</Typography>
+              <Typography align="center"><a href="/orders">К заказам</a></Typography>
             </td></tr>
             : <>
               <tr className="category no-center">
@@ -189,7 +196,7 @@ export const Cart = ({ products = {} }) => {
                       <input placeholder="Комментарий к заказу" value={comment} onChange={setComment} style={{ flex: 1 }} />
                     </div>
                     <button disabled={!(name && address)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
-                      {ordered ? 'Отменить заказ' : 'Заказать на сумму ' + ru.format(total)}
+                      Заказать на сумму {ru.format(totalWithExpenses)}
                     </button>
                   </Typography>
                 </td>

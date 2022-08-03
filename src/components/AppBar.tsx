@@ -17,6 +17,8 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import PersonIcon from '@mui/icons-material/Person'
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale'
+import StoreIcon from '@mui/icons-material/Store'
+
 import Badge from '@mui/material/Badge'
 
 import { log, productsTotal, subscribe, useSelector } from '../utils'
@@ -96,11 +98,15 @@ export default () => {
           <a href="/">
             <img style={{ cursor: 'pointer', height: 37 }} src="logo.jpg" />
           </a>
-          <Typography variant="h4" style={{ flexGrow: 1, marginLeft: '1em', color: 'rgba(0,0,0,0.9)' }}>
+          <Typography variant="h4" style={{ flexGrow: 1, marginLeft: '1em', color: 'rgba(0,0,0,0.9)', fontFamily: '"Journal Sans New", Roboto' }}>
             <A href="/">
               СоцКооп
             </A>
           </Typography>
+
+          <IconButton href="/">
+            <StoreIcon />
+          </IconButton>
 
 
           {admin &&

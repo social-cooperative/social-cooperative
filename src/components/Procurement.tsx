@@ -166,7 +166,7 @@ export const Orders = ({ orders = {} }) => {
                   </td>
                 </tr>
                 {Object.entries<any>(orders).sort(sortByDate).map(([id, order]) =>
-                  <Order key={id} id={id} order={order} />
+                  <Order key={id} id={id} order={order} cancellable />
                 )}
               </React.Fragment>
             )

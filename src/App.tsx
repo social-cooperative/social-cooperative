@@ -65,6 +65,7 @@ import AppBar from './components/AppBar'
 import UserMenu from './components/UserMenu'
 import Orders from './components/Orders'
 import Procurement from './components/Procurement'
+import Typography from '@mui/material/Typography'
 
 
 const adminSelector = store => !!store.claims.admin
@@ -84,7 +85,7 @@ const Pathnames = () => {
 
 }
 
-const Version = styled.div`
+const Version = styled(Typography)`
   color: rgba(128,128,128,0.2);
   font-size: small;
   text-align: center;

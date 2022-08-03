@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'Journal Sans New';
+  src: local('Journal Sans New'), local('JournalSansNew'),
+    url('JournalSansNew.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Journal Sans New';
+  src: local('Journal Sans New Display'), local('JournalSansNew-Display'),
+    url('JournalSansNew-Display.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Journal Sans New';
+  src: local('Journal Sans New Italic'), local('JournalSansNew-Italic'),
+    url('JournalSansNew-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Journal Sans New';
+  src: local('Journal Sans New Bold'), local('JournalSansNew-Bold'),
+    url('JournalSansNew-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Journal Sans New';
+  src: local('Journal Sans New Oblique'), local('JournalSansNew-Oblique'),
+    url('JournalSansNew-Oblique.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}

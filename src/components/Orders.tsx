@@ -26,7 +26,7 @@ export const Product = props => {
     <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
       <td>
         <Typography title={model.product.comment}>
-          {model.product.name} <small>({model.product.category})</small>
+          {model.product.name} {!!model.product.category && <small>({model.product.category})</small>}
         </Typography>
       </td><td>
         <Typography>
@@ -69,7 +69,13 @@ export default () => {
     'value',
     snap => setOrdersHistory(snap.val() || {})
   ), [])
-  return <Orders orders={orders} ordersHistory={ordersHistory} />
+  const [ordersCanceled, setOrdersCanceled] = useState({})
+  useEffect(() => subscribe(
+    database.ref(`ordersCanceled/${auth.currentUser.uid}`),
+    'value',
+    snap => setOrdersCanceled(snap.val() || {})
+  ), [])
+  return <Orders orders={orders} ordersHistory={ordersHistory} ordersCanceled={ordersCanceled} />
 }
 
 const dateRuConfig = {
@@ -80,13 +86,31 @@ const dateRuConfig = {
   minute: '2-digit'
 } as any
 
-export const Order = ({ order, id }) => {
+export const Order = ({ order, id, cancellable = false, deletable = false }) => {
   const { products, date } = order
   const total = productsTotal(products)
   const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
+
+  const cancelOrder = useCallback(() => {
+    if (cancellable && confirm(`Вы собираетесь удалить заказ пользователя ${order.name}${order.name && ' '}${order.phone} от ${orderedAt} на сумму ${ru.format(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
+      database.ref(`ordersCanceled/${order.uid}/${id}`).set(order)
+        .then(() => database.ref(`orders/${order.uid}/${id}`).set(null))
+        .catch(() => { })
+    }
+  }, [id, order, orderedAt, cancellable])
+
+  const deleteOrder = useCallback(() => {
+    if (deletable && confirm(`Вы собираетесь удалить ваш отменённый заказ от ${orderedAt} на сумму ${ru.format(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
+      database.ref(`ordersCanceled/${order.uid}/${id}`).set(null)
+        .catch(() => { })
+    }
+  }, [id, order, orderedAt, deletable])
+
   return <>
     <tr className="category">
       <td colSpan={100}>
+        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
+        {deletable && <button style={{ float: 'right' }} onClick={deleteOrder}>🗑️</button>}
         <Typography variant="h6">
           Заказ от <b>{orderedAt}</b> на сумму <b>{ru.format(total)}</b>
         </Typography>
@@ -111,7 +135,7 @@ export const Order = ({ order, id }) => {
 
 const sortByDate = ([ka, a], [kb, b]) => b.date - a.date
 
-export const Orders = ({ orders = {}, ordersHistory = {} }) => {
+export const Orders = ({ orders = {}, ordersHistory = {}, ordersCanceled = {} }) => {
   return (
     <Root>
       <PageTitle>Текущие заказы</PageTitle>
@@ -155,6 +179,29 @@ export const Orders = ({ orders = {}, ordersHistory = {} }) => {
           {!Object.entries(ordersHistory).length &&
             <tr><td colSpan={100}>
               <Typography variant="h6" align="center">У вас нет исполненных заказов</Typography>
+            </td></tr>
+          }
+        </tbody>
+      </Table>
+
+      <PageTitle sx={{ marginTop: '1em' }}>Отменённые заказы</PageTitle>
+      <Table>
+        <thead>
+          <tr>
+            <td><Typography>Наименование</Typography></td>
+            <td><Typography>Ед. изм.</Typography></td>
+            <td><Typography>Цена</Typography></td>
+            <td><Typography>Кол-во</Typography></td>
+            <td><Typography>Стоимость</Typography></td>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries<any>(ordersCanceled).sort(sortByDate).map(([id, order]) =>
+            <Order key={id} id={id} order={order} deletable />
+          )}
+          {!Object.entries(ordersCanceled).length &&
+            <tr><td colSpan={100}>
+              <Typography variant="h6" align="center">У вас нет отменённых заказов</Typography>
             </td></tr>
           }
         </tbody>
