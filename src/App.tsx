@@ -12,7 +12,7 @@ body, h1, h2, h3, h4, p, ul, ol, li, figure,
 figcaption, blockquote, dl, dd { margin: 0 }
 
 /* Make body (and app) like in html 4 */
-body, html, #app { min-height: 100% }
+body, html, #app { height: 100% }
 
 /* Make images easier to work with */
 img { max-width: 100% }
@@ -65,6 +65,7 @@ import AppBar from './components/AppBar'
 import UserMenu from './components/UserMenu'
 import Orders from './components/Orders'
 import Procurement from './components/Procurement'
+import UnderConstruction from './components/UnderConstruction'
 import Typography from '@mui/material/Typography'
 
 
@@ -85,6 +86,17 @@ const Pathnames = () => {
 
 }
 
+const PathnamesTopLevel = ({ children }) => {
+  const pathname = location.pathname.slice(1)
+  switch (pathname) {
+    case '':
+      return <UnderConstruction />
+    default:
+      return children
+  }
+
+}
+
 const Version = styled(Typography)`
   color: rgba(128,128,128,0.2);
   font-size: small;
@@ -98,14 +110,16 @@ export default function App() {
     <Provider>
       <CssReset />
       <CssGlobals />
-      <AuthShield>
-        <AppBar />
-        <UserMenu />
-        <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <Pathnames />
-          <Version>СоцКооп версия {packageInfo.version}</Version>
-        </div>
-      </AuthShield>
+      <PathnamesTopLevel>
+        <AuthShield>
+          <AppBar />
+          <UserMenu />
+          <div style={{ maxWidth: 960, margin: '0 auto' }}>
+            <Pathnames />
+            <Version>СоцКооп версия {packageInfo.version}</Version>
+          </div>
+        </AuthShield>
+      </PathnamesTopLevel>
     </Provider>
   )
 }
