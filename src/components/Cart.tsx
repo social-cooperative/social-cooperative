@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
+import Tooltip from '@mui/material/Tooltip'
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import SkipNextIcon from '@mui/icons-material/SkipNext'
@@ -46,13 +47,24 @@ const Product = props => {
   }), [model])
 
   return (
-    <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
+    <tr className="product" style={{
+      background: props.darker ? '#E7F7EB' : undefined,
+      fontStyle: frozen ? 'italic' : undefined,
+    }}>
       <td className="image">
         {simple || <FirebaseImageUploader src={model.product.image} enabled={false} component={CellImg} />}
       </td><td>
-        <Typography variant="h6" title={model.product.comment}>
-          {model.product.name}
-        </Typography>
+        {frozen ? (
+          <Tooltip title={productChangedMessage}>
+            <Typography variant="h6" title={model.product.comment}>
+              {model.product.name} *
+            </Typography>
+          </Tooltip>
+        ) : (
+          <Typography variant="h6" title={model.product.comment}>
+            {model.product.name}
+          </Typography>
+        )}
       </td><td>
         <Typography>
           {model.product.unit}
@@ -75,7 +87,6 @@ const Product = props => {
           <button style={{ width: 25 }} onClick={decCount} disabled={frozen || model.count <= 1}>-</button>
           <button onClick={deleteFromCart}>Удалить</button>
         </Typography>
-        {frozen && <div style={{ width: 128, textAlign: 'justify' }}>{productChangedMessage}</div>}
       </td>}
     </tr>
   )

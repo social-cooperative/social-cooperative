@@ -16,6 +16,7 @@ const Root = styled.div`
   padding: 1em;
 `
 
+const truncate = (str, n) => str.length <= n ? str : str.substring(0, n + 1) + '...'
 
 const adminSelector = store => !!store.claims.admin
 
@@ -75,6 +76,18 @@ const Product = props => {
         <Typography>
           <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={edit} />
         </Typography>
+        {edit ? (
+          <Typography>
+            <FirebaseEditorField path={`/products/${model.id}/link`} value={model.link} enabled={edit}>
+              {v => truncate(v, 20)}
+            </FirebaseEditorField>
+          </Typography>
+        ) : (model.link &&
+          <Typography>
+            <a href={model.link}>Подробнее</a>
+          </Typography>
+        )
+        }
       </td>{admin && <td>
         <Typography>
           <FirebaseEditorField path={`/products/${model.id}/commentInternal`} value={model.commentInternal} enabled={edit} />
@@ -125,6 +138,32 @@ const addProduct = (category?) => () => {
   database.ref('products').push({ category })
 }
 
+const overwriteProducts = () => {
+  if (!confirm(`Вы собираетесь перезаписать базу данных продуктов, это действие невозможно отменить.\n\nВы уверены?`))
+    return
+  alert('Вставьте данные для перезаписи в переменную window.DATA_OVERWRITE')
+  const overwrite = window.DATA_OVERWRITE
+  console.log(overwrite)
+  if (!overwrite)
+    return
+  let products = []
+  try {
+    products = JSON.parse(overwrite)
+  } catch (err) {
+    console.log(err)
+    alert('Неправильный формат данных')
+    return
+  }
+  if (!confirm(`Вы собираетесь перезаписать базу данных продуктов, это действие невозможно отменить.\n\nВы уверены?`))
+    return
+
+  database.ref('products').set(null)
+    .then(() => Promise.all(products.map(product =>
+      database.ref('products').push(product)
+    )))
+    .then(() => alert('Говто'))
+}
+
 export default () => {
   const admin = useSelector(adminSelector)
   const [edit, toggleEdit] = useToggle(false)
@@ -136,6 +175,7 @@ export default () => {
       <PageTitle>
         Каталог
         {admin && <button style={{ float: 'right' }} onClick={toggleEdit}>{edit ? '💾' : '✏️'}</button>}
+        {edit && <button style={{ float: 'right' }} onClick={overwriteProducts}>🗃️</button>}
         {edit && <button style={{ float: 'right' }} onClick={addProduct()}>➕</button>}
       </PageTitle>
       <Table>

@@ -131,9 +131,10 @@ export const Orders = ({ orders = {} }) => {
     Promise.all(Object.entries<any>(orders).map(([uid, order]) => {
       for (const id in order) order[id].procured = procured
       return database.ref(`ordersHistory/${uid}`).update(order)
-    })).then(() =>
-      database.ref(`orders`).set(null)
-    )
+        .then(() => Promise.all(Object.entries<any>(order).map(([id]) => {
+          database.ref(`orders/${uid}/${id}`).set(null)
+        })))
+    }))
   }, [orders])
   return (
     <Root>

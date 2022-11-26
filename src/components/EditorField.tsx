@@ -2,12 +2,12 @@ import { log, useToggle } from '../utils'
 import { useState, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
 
-const Input = styled.input.attrs(({ value }) => ({ size: Math.min(String(value).length, 20) }))``
+const Input = styled.input.attrs(({ value }) => ({ size: Math.min(String(value).length || 1, 20) }))``
 
 const defaultRender = value => value || '-'
 const preventDefault = event => event.preventDefault()
 
-export const EditorField = ({ chidlren = defaultRender, value, enabled = true, number = false, onSave, immediate = true }) => {
+export const EditorField = ({ children = defaultRender, value, enabled = true, number = false, onSave, immediate = true }) => {
   const saveValue = event => number ? +event.target.value || 0 : event.target.value
   const [editing, setEditing] = useState(false)
   const [innerValue, setInnerValue] = useState(value)
@@ -42,7 +42,7 @@ export const EditorField = ({ chidlren = defaultRender, value, enabled = true, n
       onBlur={stopEditing}
       autoFocus
     />
-    : <span /*onDoubleClick*/ onClick={startEditing}>{chidlren(innerValue)}</span>
+    : <span /*onDoubleClick*/ onClick={startEditing}>{children(innerValue)}</span>
 }
 
 export default EditorField

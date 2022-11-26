@@ -12,7 +12,7 @@ body, h1, h2, h3, h4, p, ul, ol, li, figure,
 figcaption, blockquote, dl, dd { margin: 0 }
 
 /* Make body (and app) like in html 4 */
-body, html, #app { height: 100% }
+body, html, #app { min-height: 100% }
 
 /* Make images easier to work with */
 img { max-width: 100% }
@@ -78,6 +78,7 @@ const Pathnames = () => {
   switch (pathname) {
     case 'cart': return <Cart />
     case 'orders': return <Orders />
+    case 'store': return <ProductList />
     case 'procurement': return admin ? <Procurement /> : <ProductList />
     default: return <>
       <ProductList />

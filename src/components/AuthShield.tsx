@@ -7,9 +7,16 @@ import { auth, firebase, logout } from '../firebase'
 import { timeout, useDispatch } from '../utils'
 
 const ShiedRoot = styled.div`
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const ShiedInner = styled.div`
+  text-align: center;
+  position: relative;
 `
 
 const Progress = styled.div`

@@ -1,8 +1,9 @@
 import styled from 'styled-components'
 import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 
 const ShiedRoot = styled.div`
-  height: 100%;
+  height: 100vh;
 
   display: flex;
   align-items: center;
@@ -27,11 +28,19 @@ export default function UnderConstruction() {
       <ShiedInner>
         <ShiedLogo src="under-construction.jpg" />
         <div>
-          <Typography variant="h4" style={{ fontFamily: '"Journal Sans New", Roboto', marginBottom: '0.3em' }}>
+          <Typography variant="h4" style={{ fontFamily: '"Journal Sans New", Roboto', marginBottom: '0.6rem' }}>
             <img style={{ height: '0.8em', marginRight: '0.3em' }} src="logo.jpg" />
             СоцКооп
           </Typography>
           <Typography variant="button">Сайт в разработке</Typography>
+          <br/>
+          <Button
+            variant="contained"
+            href="/store"
+            sx={{ marginTop: '1em' }}
+          >
+            В магазин
+          </Button>
         </div>
       </ShiedInner>
     </ShiedRoot>
