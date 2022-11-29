@@ -126,8 +126,8 @@ export const Cart = ({ products = {} }) => {
 
   useEffect(() => subscribe(database.ref(`users/${auth.currentUser.uid}`), 'value', snap => {
     const user = snap.val()
-    setNameRaw(user.name || '')
-    setAddressRaw(user.address || '')
+    setNameRaw(user?.name || '')
+    setAddressRaw(user?.address || '')
   }), [])
 
   useEffect(() => {
@@ -137,11 +137,10 @@ export const Cart = ({ products = {} }) => {
   const productCount = Object.entries(products).length
 
   const total = productsTotal(products)
-  const totalWithExpenses = total + Math.floor(total * 0.15)
 
   const placeOrder = useCallback(() => {
     database.ref(`orders/${auth.currentUser.uid}`).push({
-      products: { ...products, ['expenses|' + Date.now() + String(Math.random()).slice(2)]: { product: { name: 'Организационные расходы', category: 'ФОНД', price: Math.floor(total * 0.15), unit: '15%' }, count: 1 } },
+      products,
       date: firebase.database.ServerValue.TIMESTAMP,
       uid: auth.currentUser.uid,
       phone: auth.currentUser.phoneNumber,
@@ -187,9 +186,6 @@ export const Cart = ({ products = {} }) => {
             </React.Fragment>
           )}
 
-          {!!productCount &&
-            <Product simple darker={productCount % 2} model={{ product: { name: 'Организационные расходы', price: Math.floor(total * 0.15), unit: '15%' }, count: 1 }} />
-          }
           {!productCount
             ? <tr><td colSpan={100}>
               <Typography variant="h6" align="center">Ваша корзина пуста</Typography>
@@ -207,8 +203,11 @@ export const Cart = ({ products = {} }) => {
                       <input placeholder="Комментарий к заказу" value={comment} onChange={setComment} style={{ flex: 1 }} />
                     </div>
                     <button disabled={!(name && address)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
-                      Заказать на сумму {ru.format(totalWithExpenses)}
+                      Заказать на сумму {ru.format(total)}
                     </button>
+                    <Typography style={{ marginTop: '1em' }}>
+                      * Если вы покупаете у нас в первый раз, вам понадобится подписать заявление на вступление в наш кооператив и согласие на обработку персональных данных в соответствие закона 152-ФЗ. Эти документы привезёт курьер при первой доставке. Не забудьте паспорт
+                    </Typography>
                   </Typography>
                 </td>
               </tr>
