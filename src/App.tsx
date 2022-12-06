@@ -46,6 +46,10 @@ const CssGlobals = createGlobalStyle`
   width: 100%;
   height: 100%;
 }
+
+html {
+  font-family: "Montserrat",sans-serif !important;
+}
 `
 
 import { useMediaQuery } from 'react-responsive'
