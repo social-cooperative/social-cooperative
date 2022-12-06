@@ -51,7 +51,7 @@ const Progress = styled.div`
 `
 
 const ShiedLogo = styled.img.attrs(
-  () => ({ src: '/logo.jpg' })
+  () => ({ src: '/logo.svg' })
 )`
   display: block;
   width: 360px;
@@ -64,9 +64,12 @@ const uiConfig = {
     signInSuccessWithAuthResult: () => false,
   },
   signInOptions: [
+    {
+      defaultCountry: 'RU',
+      provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+    },
     //firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     //firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    firebase.auth.PhoneAuthProvider.PROVIDER_ID,
   ],
 }
 
