@@ -1,13 +1,5 @@
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import SkipNextIcon from '@mui/icons-material/SkipNext'
 import styled from 'styled-components'
 
 import { firebase, auth, database } from '../firebase'
@@ -18,6 +10,8 @@ import { productsTotal, subscribeOnce, useInputState } from '../utils'
 const Root = styled.div`
   padding: 1em;
 `
+
+const isTotalValid = (sum: number) => sum >=3000;
 
 const productChangedMessage = 'Информация об этом продукте была изменена, но за вами сохранено право приобрести то количество которое вы уже добавили в корзину.'
 
@@ -95,12 +89,9 @@ const Product = props => {
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
-import { log, once, subscribe, useCounter, useSelector, useToggle } from '../utils'
+import { subscribe } from '../utils'
 import React, { useCallback, useEffect, useState } from 'react'
-import FirebaseEditorField from './FirebaseEditorField'
 import FirebaseImageUploader from './FirebaseImageUploader'
-import { AnyRecord } from 'dns'
-import products from '../products'
 import PageTitle from './PageTitle'
 
 const categorize = products => products.reduce((acc, v) => ((acc[v.product.category] ? acc[v.product.category].push(v) : (acc[v.product.category] = [v])), acc), {}) as any
@@ -114,7 +105,6 @@ export default () => {
   ), [])
 
   return <Cart products={products} />
-
 }
 
 export const Cart = ({ products = {} }) => {
@@ -202,7 +192,18 @@ export const Cart = ({ products = {} }) => {
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
                       <input placeholder="Комментарий к заказу" value={comment} onChange={setComment} style={{ flex: 1 }} />
                     </div>
-                    <button disabled={!(name && address)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
+                    {
+                      !isTotalValid(total) &&
+                      <React.Fragment>
+                        <Typography style={{ marginTop: '8px', fontWeight: 600 }}>
+                          К сожалению, возможность сделать заказ на сумму меньше 3000 ₽ рублей временно недоступна.
+                        </Typography>
+                        <Typography style={{ marginTop: '8px', marginBottom: '8px' }}>
+                          Вы можете либо увеличить сумму заказа, либо скооперироваться с другими людьми и объединить ваши заказы для набора нужной суммы.
+                        </Typography>
+                      </React.Fragment> 
+                    }
+                    <button disabled={!(name && address) || !isTotalValid(total)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
                       Заказать на сумму {ru.format(total)}
                     </button>
                     <Typography style={{ marginTop: '1em' }}>
