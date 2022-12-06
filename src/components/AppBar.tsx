@@ -95,14 +95,11 @@ export default () => {
     <AppBar position="sticky" color="transparent">
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
-          <a href="/store">
-            <img style={{ cursor: 'pointer', height: 37 }} src="logo.jpg" />
-          </a>
-          <Typography variant="h4" style={{ flexGrow: 1, marginLeft: '1em', color: 'rgba(0,0,0,0.9)', fontFamily: '"Journal Sans New", Roboto' }}>
-            <A href="/store">
-              СоцКооп
-            </A>
-          </Typography>
+          <div style={{ flexGrow: 1, marginLeft: '1em'}}>
+            <a href="/store" >
+              <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
+            </a>
+          </div>
 
           <IconButton href="/store">
             <StoreIcon />
