@@ -35,7 +35,7 @@ export const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {model.product.price ? String(model.product.price).replace('.', ',') + 'р.' : '-'}
+          {model.product.price ? String(model.product.price).replace('.', ',') + ' ₽' : '-'}
         </Typography>
       </td><td>
         <Typography>
@@ -43,7 +43,7 @@ export const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {String(total).replace('.', ',') + 'р.'}
+          {String(total).replace('.', ',') + ' ₽'}
         </Typography>
       </td>
     </tr>
@@ -82,7 +82,7 @@ const dateRuConfig = {
   minute: '2-digit'
 } as any
 
-export const Order = ({ order, id, cancellable = false, deletable = false }) => {
+export const Order = ({ order, id, cancellable = false, deletable = false, actual = false }) => {
   const { products, date } = order
   const total = productsTotal(products)
   const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
@@ -109,7 +109,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false }) => 
 
 
   return <>
-    <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal}/>
+    {actual && <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal}/>}
     <tr className="category">
       <td colSpan={100}>
         {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
@@ -126,7 +126,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false }) => 
         {!!order.comment && <Typography align="left">
           {order.comment}
         </Typography>}
-        <div className='pay-wrapper'><Button variant="outlined" onClick={openModal}>Оплатить</Button></div>
+        {actual && <div className='pay-wrapper'><Button variant="outlined" onClick={openModal}>Оплатить</Button></div>}
       </td>
     </tr>
     {Object.entries<any>(products).map(([id, p], i) => <Product
@@ -155,7 +155,7 @@ export const Orders = ({ orders = {}, ordersHistory = {}, ordersCanceled = {} })
         </thead>
         <tbody>
           {Object.entries<any>(orders).sort(sortByDate).map(([id, order]) =>
-            <Order key={id} id={id} order={order} />
+            <Order key={id} id={id} order={order} actual/>
           )}
           {!Object.entries(orders).length &&
             <tr><td colSpan={100}>

@@ -17,8 +17,8 @@ const Root = styled.div`
 
   .category {
     text-align: center;
-    background-color: rgba(231,247,235,0.8);
-    color: #095909;
+    background-color: #239F2328;
+    color: #239F23;
     padding: 12px 0;
     font-size: 32px;
     font-weight: 600; 
@@ -26,9 +26,15 @@ const Root = styled.div`
 
   .product-list {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-gap: 24px;
     margin: 24px 0;
+  }
+
+  @media (min-width: 996px) {
+    .product-list {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
   }
 
   .product {
@@ -121,17 +127,17 @@ const Root = styled.div`
   }
 
   .product-counter button:last-of-type {
-    background-color: #A2DE7A;
+    background-color: #60CE60;
   }
 
   .product-price {
     font-size: 24px;
     font-weight: 600;
-    color: #095909;
+    color: #239F23;
   }
 
   .product-buy {
-    background-color: #095909;
+    background-color: #239F23;
     border: 0;
     cursor: pointer;
     text-transform: uppercase;

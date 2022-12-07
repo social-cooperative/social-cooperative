@@ -27,9 +27,8 @@ import { useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 
 const AppToolbar = styled(Toolbar)`
-  backdrop-filter: blur(8px);
-  background: rgba(231, 247, 235, 0.8);
   top: 0;
+  background-color: white;
 `
 
 const A = styled.a`

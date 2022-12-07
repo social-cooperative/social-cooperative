@@ -15,7 +15,7 @@ export const Table = styled.table`
   
   & .category td {
     padding: 1em;
-    background: #d7f5df;
+    background: #239F2328;
     text-align: center;
   }
   

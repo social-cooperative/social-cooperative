@@ -34,7 +34,7 @@ export default function AlertDialog({ isOpened, id, onClose, first = false }: IA
         <DialogContent>
             <DialogContentText id="alert-dialog-description">
                 <Root>
-                    При оплате с телефона используйте <a href="http://createqr.ru">ссылку</a>.
+                    Используйте для оплаты своё банковское приложение.
                     <div className='image-wrapper'>
                         <img src="http://createqr.ru/invoice?Name=Иванов И. И.&PersonalAcc=40802810902280000111&BankName=АО 'АЛЬФА-БАНК' &BIC=044525593&CorrespAcc=30101810200000000593&SumRub=100&Purpose=Оплата по счету" alt="QR-код для оплаты" />
                     </div>

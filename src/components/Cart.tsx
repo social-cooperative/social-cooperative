@@ -66,7 +66,7 @@ const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {model.product.price ? String(model.product.price).replace('.', ',') + 'р.' : '-'}
+          {model.product.price ? String(model.product.price).replace('.', ',') + ' ₽' : '-'}
         </Typography>
       </td><td>
         <Typography>
@@ -74,7 +74,7 @@ const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {String(total).replace('.', ',') + 'р.'}
+          {String(total).replace('.', ',') + ' ₽'}
         </Typography>
       </td>{simple ? <td /> : <td>
         <Typography component="div" style={{ display: 'flex' }}>
@@ -153,7 +153,7 @@ export const Cart = ({ products = {} }) => {
   return (
     <Root>
       <PageTitle>Корзина</PageTitle>
-      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} first={true} />
+      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} first />
       <Table>
         <thead>
           <tr>

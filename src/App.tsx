@@ -1,4 +1,18 @@
 import styled, { createGlobalStyle } from 'styled-components'
+import { createTheme, ThemeProvider, Typography } from '@mui/material'
+
+import { Provider } from './store'
+import { useSelector } from './utils'
+import { logout } from './firebase'
+import ProductList from './components/ProductList'
+import Cart from './components/Cart'
+import AppBar from './components/AppBar'
+import UserMenu from './components/UserMenu'
+import Orders from './components/Orders'
+import Procurement from './components/Procurement'
+import AuthShield from './components/AuthShield'
+import UnderConstruction from './components/UnderConstruction'
+import packageInfo from '../package.json'
 
 const CssReset = createGlobalStyle`
 /* Box sizing rules */
@@ -48,29 +62,22 @@ const CssGlobals = createGlobalStyle`
 }
 
 html {
-  font-family: "Montserrat",sans-serif !important;
+  font-family: Inter, sans-serif;
 }
 `
 
-import { useMediaQuery } from 'react-responsive'
-import { useState, useEffect, Children } from 'react'
-import { Provider, dispatch } from './store'
-import { log, subscribe, useDispatch, useSelector } from './utils'
-import { auth, logout } from './firebase'
-import AuthShield from './components/AuthShield'
 const logoutAndReload = () => logout().then(() => location.reload())
 
-import { database } from './firebase'
-import packageInfo from '../package.json'
-
-import ProductList from './components/ProductList'
-import Cart from './components/Cart'
-import AppBar from './components/AppBar'
-import UserMenu from './components/UserMenu'
-import Orders from './components/Orders'
-import Procurement from './components/Procurement'
-import UnderConstruction from './components/UnderConstruction'
-import Typography from '@mui/material/Typography'
+const theme = createTheme({
+  typography: {
+    fontFamily: 'Inter, sans-serif',
+  },
+  palette: {
+    primary: {
+      main: '#239F23'
+    },
+  },
+});
 
 
 const adminSelector = store => !!store.claims.admin
@@ -113,18 +120,20 @@ export default function App() {
 
   return (
     <Provider>
-      <CssReset />
-      <CssGlobals />
-      <PathnamesTopLevel>
-        <AuthShield>
-          <AppBar />
-          <UserMenu />
-          <div style={{ maxWidth: 960, margin: '0 auto' }}>
-            <Pathnames />
-            <Version>СоцКооп версия {packageInfo.version}</Version>
-          </div>
-        </AuthShield>
-      </PathnamesTopLevel>
+      <ThemeProvider theme={theme}>
+        <CssReset />
+        <CssGlobals />
+        <PathnamesTopLevel>
+          <AuthShield>
+            <AppBar />
+            <UserMenu />
+            <div style={{ maxWidth: 960, margin: '0 auto' }}>
+              <Pathnames />
+              <Version>СоцКооп версия {packageInfo.version}</Version>
+            </div>
+          </AuthShield>
+        </PathnamesTopLevel>
+      </ThemeProvider>
     </Provider>
   )
 }
