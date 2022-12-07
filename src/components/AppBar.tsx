@@ -96,7 +96,7 @@ export default () => {
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
           <a href="/store">
-            <img style={{ cursor: 'pointer', height: 37 }} src="logo.jpg" />
+            <img style={{ cursor: 'pointer', height: 37 }} src="logo.png" />
           </a>
           <Typography variant="h4" style={{ flexGrow: 1, marginLeft: '1em', color: 'rgba(0,0,0,0.9)', fontFamily: '"Journal Sans New", Roboto' }}>
             <A href="/store">

@@ -51,7 +51,7 @@ const Progress = styled.div`
 `
 
 const ShiedLogo = styled.img.attrs(
-  () => ({ src: '/logo.jpg' })
+  () => ({ src: '/logo.png' })
 )`
   display: block;
   width: 360px;
