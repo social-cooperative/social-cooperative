@@ -1,20 +1,21 @@
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import SkipNextIcon from '@mui/icons-material/SkipNext'
 import styled from 'styled-components'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { useCallback, useEffect, useState } from 'react'
+import Button from '@mui/material/Button';
 
+import QRModal from './QRModal';
+import { productsTotal, subscribe } from '../utils'
+import PageTitle from './PageTitle'
 import { auth, database } from '../firebase'
-import { Table, CellImg } from './Table'
+import { Table } from './Table'
 
 const Root = styled.div`
   padding: 1em;
+
+  .pay-wrapper {
+    margin-top: 8px;
+    text-align: left;
+  }
 `
 
 const adminSelector = store => !!store.claims.admin
@@ -49,12 +50,7 @@ export const Product = props => {
   )
 }
 
-
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
-
-import { log, productsTotal, subscribe, useCounter, useSelector, useToggle } from '../utils'
-import { useCallback, useEffect, useState } from 'react'
-import PageTitle from './PageTitle'
 
 export default () => {
   const [orders, setOrders] = useState({})
@@ -91,6 +87,11 @@ export const Order = ({ order, id, cancellable = false, deletable = false }) => 
   const total = productsTotal(products)
   const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
 
+  const [isQRModalOpened, setIsQRModalOpened] = useState(false)
+
+  const openModal = () => { setIsQRModalOpened(true) };
+  const closeModal = () => { setIsQRModalOpened(false) };
+
   const cancelOrder = useCallback(() => {
     if (cancellable && confirm(`Вы собираетесь удалить заказ пользователя ${order.name}${order.name && ' '}${order.phone} от ${orderedAt} на сумму ${ru.format(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
       database.ref(`ordersCanceled/${order.uid}/${id}`).set(order)
@@ -106,7 +107,9 @@ export const Order = ({ order, id, cancellable = false, deletable = false }) => 
     }
   }, [id, order, orderedAt, deletable])
 
+
   return <>
+    <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal}/>
     <tr className="category">
       <td colSpan={100}>
         {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
@@ -123,6 +126,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false }) => 
         {!!order.comment && <Typography align="left">
           {order.comment}
         </Typography>}
+        <div className='pay-wrapper'><Button variant="outlined" onClick={openModal}>Оплатить</Button></div>
       </td>
     </tr>
     {Object.entries<any>(products).map(([id, p], i) => <Product

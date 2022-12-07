@@ -2,10 +2,11 @@ import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
 import styled from 'styled-components'
 
+import QRModal from './QRModal';
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { productSlug } from './ProductList'
-import { productsTotal, subscribeOnce, useInputState } from '../utils'
+import { productsTotal, useInputState } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
@@ -86,7 +87,6 @@ const Product = props => {
   )
 }
 
-
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
 import { subscribe } from '../utils'
@@ -113,6 +113,10 @@ export const Cart = ({ products = {} }) => {
   const [name, setName, setNameRaw] = useInputState()
   const [address, setAddress, setAddressRaw] = useInputState()
   const [comment, setComment] = useInputState()
+  const [isQRModalOpened, setIsQRModalOpened] = useState(false)
+
+  const openModal = () => { setIsQRModalOpened(true) };
+  const closeModal = () => { setIsQRModalOpened(false) };
 
   useEffect(() => subscribe(database.ref(`users/${auth.currentUser.uid}`), 'value', snap => {
     const user = snap.val()
@@ -143,11 +147,13 @@ export const Cart = ({ products = {} }) => {
       address,
     })
     database.ref(`carts/${auth.currentUser.uid}`).set(null)
+    openModal();
   }, [products, name, address, comment])
 
   return (
     <Root>
       <PageTitle>Корзина</PageTitle>
+      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} />
       <Table>
         <thead>
           <tr>
