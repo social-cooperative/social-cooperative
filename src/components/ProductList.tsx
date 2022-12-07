@@ -1,16 +1,7 @@
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import SkipNextIcon from '@mui/icons-material/SkipNext'
 import styled from 'styled-components'
 
 import { auth, database, storage } from '../firebase'
-import { Table, CellImg } from './Table'
+import { CellImg } from './Table'
 
 const Root = styled.div`
   padding: 1em;
@@ -313,7 +304,7 @@ const overwriteProducts = () => {
     .then(() => Promise.all(products.map(product =>
       database.ref('products').push(product)
     )))
-    .then(() => alert('Говто'))
+    .then(() => alert('Готово'))
 }
 
 export default () => {
