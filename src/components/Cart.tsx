@@ -153,7 +153,7 @@ export const Cart = ({ products = {} }) => {
   return (
     <Root>
       <PageTitle>Корзина</PageTitle>
-      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} />
+      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} first={true} />
       <Table>
         <thead>
           <tr>
