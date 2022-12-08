@@ -11,7 +11,7 @@ import UserMenu from './components/UserMenu'
 import Orders from './components/Orders'
 import Procurement from './components/Procurement'
 import AuthShield from './components/AuthShield'
-import UnderConstruction from './components/UnderConstruction'
+import MainPage from './components/MainPage'
 import packageInfo from '../package.json'
 
 const CssReset = createGlobalStyle`
@@ -102,7 +102,7 @@ const PathnamesTopLevel = ({ children }) => {
   const pathname = location.pathname.slice(1)
   switch (pathname) {
     case '':
-      return <UnderConstruction />
+      return <MainPage />
     default:
       return children
   }

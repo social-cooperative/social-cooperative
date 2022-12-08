@@ -95,7 +95,7 @@ export default () => {
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
           <div style={{ flexGrow: 1, marginLeft: '1em'}}>
-            <a href="/store" >
+            <a href="/" >
               <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
             </a>
           </div>
