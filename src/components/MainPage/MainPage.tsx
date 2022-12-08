@@ -5,7 +5,7 @@ export default function MainPage() {
     <Root>
         <div className="main-page">
         <header className="header">
-            <img src="../../../static/logo.svg" alt="" height="37" />
+            <img src="logo.svg" alt="" height="37" />
         </header>
         <section className="preview">
         <div className="preview-container">
@@ -36,7 +36,7 @@ export default function MainPage() {
             <article className="qr-item">
                 <img
                 className="qr-item-code"
-                src="../../../static/qr-aside-01.svg"
+                src="qr-aside-01.svg"
                 alt="Информационный телеграм-канал СоцКооп"
                 />
                 <p className="qr-item-label">
@@ -75,7 +75,7 @@ export default function MainPage() {
             <article className="qr-item">
                 <img
                 className="qr-item-code"
-                src="../../../static/qr-aside-02.svg"
+                src="qr-aside-02.svg"
                 alt="Информационный телеграм-канал СоцКооп"
                 />
                 <p className="qr-item-label">
@@ -122,7 +122,7 @@ export default function MainPage() {
             </p>
             </article>
             <aside className="page-section-aside">
-            <img src="../../../static/aside-02.jpg" alt="Давайте закупаться вместе!" />
+            <img src="aside-02.jpg" alt="Давайте закупаться вместе!" />
             </aside>
         </section>
         <section className="page-section">
@@ -169,7 +169,7 @@ export default function MainPage() {
             </p>
             </article>
             <aside className="page-section-aside">
-            <img src="../../../static/aside-03.jpg" alt="Привет, это СоцКооп!" />
+            <img src="aside-03.jpg" alt="Привет, это СоцКооп!" />
             </aside>
         </section>
         <section className="page-section">
@@ -187,7 +187,7 @@ export default function MainPage() {
             </p>
             </article>
             <aside className="page-section-aside">
-            <img src="../../../static/aside-01.jpg" alt="Привет, это СоцКооп!" />
+            <img src="aside-01.jpg" alt="Привет, это СоцКооп!" />
             </aside>
         </section>
         </main>

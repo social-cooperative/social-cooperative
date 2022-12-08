@@ -44,7 +44,7 @@ export default styled.div`
     display: block;
     position: absolute;
     top: 4px;
-    background-image: url('../../../static/apple-bullet.svg');
+    background-image: url('apple-bullet.svg');
     background-size: contain;
     background-repeat: no-repeat;
     left: -20px;
