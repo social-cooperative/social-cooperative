@@ -1,10 +1,12 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography }from '@mui/material';
 import styled from 'styled-components';
+import { createQRLink, IPayDetails } from '../utils';
 
 interface IAlertDialog {
     isOpened: boolean;
     id: string;
     first?: boolean;
+    details: IPayDetails;
     onClose: () => void;
 }
 
@@ -20,7 +22,7 @@ const Root = styled.div`
     }
 `
 
-export default function AlertDialog({ isOpened, id, onClose, first = false }: IAlertDialog) {
+export default function QRModal({ isOpened, id, onClose, first = false, details }: IAlertDialog) {
   return (
         <Dialog
         open={isOpened}
@@ -29,14 +31,14 @@ export default function AlertDialog({ isOpened, id, onClose, first = false }: IA
         aria-describedby="alert-dialog-description"
         >
         <DialogTitle id="alert-dialog-title">
-            {`Оплата заказа от ${id}`}
+            {`Оплата заказа от ${details.timestamp} на сумму ${details.total} ₽`}
         </DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-description">
                 <Root>
                     Используйте для оплаты своё банковское приложение.
                     <div className='image-wrapper'>
-                        <img src="http://createqr.ru/invoice?Name=Иванов И. И.&PersonalAcc=40802810902280000111&BankName=АО 'АЛЬФА-БАНК' &BIC=044525593&CorrespAcc=30101810200000000593&SumRub=100&Purpose=Оплата по счету" alt="QR-код для оплаты" />
+                        <img src={createQRLink(details)} />
                     </div>
                     {first && 
                     <Typography>

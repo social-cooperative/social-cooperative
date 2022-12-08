@@ -11,7 +11,7 @@ export default function MainPage() {
         <div className="preview-container">
             <h1 className="preview-heading">Очередная закупка уже скоро!</h1>
             <p>Начало:</p>
-            <h2 className="preview-subheading">11 декабря, воскресенье, 09:00</h2>
+            <h2 className="preview-subheading">10 декабря, суббота, 09:00</h2>
             <a className="preview-button" href='/store'>В магазин</a>
         </div>
         </section>

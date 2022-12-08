@@ -6,7 +6,7 @@ import QRModal from './QRModal';
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { productSlug } from './ProductList'
-import { productsTotal, useInputState } from '../utils'
+import { dateRuConfig, productsTotal, useInputState } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
@@ -113,6 +113,8 @@ export const Cart = ({ products = {} }) => {
   const [name, setName, setNameRaw] = useInputState()
   const [address, setAddress, setAddressRaw] = useInputState()
   const [comment, setComment] = useInputState()
+
+  const [payDetails, setPayDetails] = useState({ phone: '', timestamp: '', total: '' })
   const [isQRModalOpened, setIsQRModalOpened] = useState(false)
 
   const openModal = () => { setIsQRModalOpened(true) };
@@ -133,11 +135,12 @@ export const Cart = ({ products = {} }) => {
   const total = productsTotal(products)
 
   const placeOrder = useCallback(() => {
+    const phone = auth.currentUser.phoneNumber;
     database.ref(`orders/${auth.currentUser.uid}`).push({
       products,
       date: firebase.database.ServerValue.TIMESTAMP,
       uid: auth.currentUser.uid,
-      phone: auth.currentUser.phoneNumber,
+      phone,
       name,
       address,
       comment,
@@ -147,13 +150,15 @@ export const Cart = ({ products = {} }) => {
       address,
     })
     database.ref(`carts/${auth.currentUser.uid}`).set(null)
+    const timestamp = new Date().toLocaleString('ru-RU', dateRuConfig);
+    setPayDetails({timestamp, phone, total})
     openModal();
   }, [products, name, address, comment])
 
   return (
     <Root>
       <PageTitle>Корзина</PageTitle>
-      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} first />
+      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} first details={payDetails} />
       <Table>
         <thead>
           <tr>

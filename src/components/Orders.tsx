@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button';
 
 import QRModal from './QRModal';
-import { productsTotal, subscribe } from '../utils'
+import { dateRuConfig, productsTotal, subscribe } from '../utils'
 import PageTitle from './PageTitle'
 import { auth, database } from '../firebase'
 import { Table } from './Table'
@@ -74,14 +74,6 @@ export default () => {
   return <Orders orders={orders} ordersHistory={ordersHistory} ordersCanceled={ordersCanceled} />
 }
 
-const dateRuConfig = {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-} as any
-
 export const Order = ({ order, id, cancellable = false, deletable = false, actual = false }) => {
   const { products, date } = order
   const total = productsTotal(products)
@@ -107,9 +99,17 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
     }
   }, [id, order, orderedAt, deletable])
 
+  console.log(order);
+
+  const details = {
+    timestamp: orderedAt,
+    phone: order.phone,
+    total
+  }
+
 
   return <>
-    {actual && <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal}/>}
+    {actual && <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} details={details}/>}
     <tr className="category">
       <td colSpan={100}>
         {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
