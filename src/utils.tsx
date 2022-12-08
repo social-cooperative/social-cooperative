@@ -532,7 +532,7 @@ export const productsTotal = products => {
   return products.reduce((acc, v) => acc += v.count * v.product.price, 0)
 }
 
-const requisites = {
+const getDetails = ({total, timestamp, phone}: IPayDetails) => ({
   Name: 'ПК "СОЦКООП"',
   PersonalAcc: '40703810901500002456',
   BankName: 'ТОЧКА ПАО БАНКА "ФК ОТКРЫТИЕ"',
@@ -540,7 +540,9 @@ const requisites = {
   CorrespAcc: '30101810845250000999',
   PayeeINN: '9715431330',
   KPP: '771501001',
-};
+  Purpose: `Внесение паевого взноса №${timestamp}-${phone} на целевую программу «Совместная закупка»`,
+  SumRub: total,
+});
 
 export interface IPayDetails {
   total: string;
@@ -548,8 +550,8 @@ export interface IPayDetails {
   timestamp: string;
 }
 
-export const createQRLink = ({total, timestamp, phone}: IPayDetails) => {
-  return `http://createqr.ru/invoice?${Object.entries(requisites).map(item => item.join('=')).join('&')}&SumRub=${total}&Purpose=Заказ от ${timestamp} ${phone}`;
+export const createQRLink = (details: IPayDetails) => {
+  return `http://createqr.ru/invoice?${Object.entries(getDetails(details)).map(item => item.join('=')).join('&')}`;
 }
 
 export const dateRuConfig = {
