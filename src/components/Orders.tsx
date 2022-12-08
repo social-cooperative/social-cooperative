@@ -78,6 +78,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
   const { products, date } = order
   const total = productsTotal(products)
   const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
+  const placedOrderId = date
 
   const [isQRModalOpened, setIsQRModalOpened] = useState(false)
 
@@ -99,8 +100,6 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
     }
   }, [id, order, orderedAt, deletable])
 
-  console.log(order);
-
   const details = {
     timestamp: orderedAt,
     phone: order.phone,
@@ -109,7 +108,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
 
 
   return <>
-    {actual && <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} details={details}/>}
+    {actual && <QRModal isOpened={isQRModalOpened} id={placedOrderId} onClose={closeModal} details={details}/>}
     <tr className="category">
       <td colSpan={100}>
         {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}

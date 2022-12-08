@@ -6,7 +6,7 @@ import QRModal from './QRModal';
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { productSlug } from './ProductList'
-import { dateRuConfig, productsTotal, useInputState } from '../utils'
+import { dateRuConfig, log, productsTotal, useInputState } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
@@ -116,6 +116,7 @@ export const Cart = ({ products = {} }) => {
 
   const [payDetails, setPayDetails] = useState({ phone: '', timestamp: '', total: '' })
   const [isQRModalOpened, setIsQRModalOpened] = useState(false)
+  const [placedOrderId, setPlacedOrderId] = useState(undefined as any)
 
   const openModal = () => { setIsQRModalOpened(true) };
   const closeModal = () => { setIsQRModalOpened(false) };
@@ -136,6 +137,10 @@ export const Cart = ({ products = {} }) => {
 
   const placeOrder = useCallback(() => {
     const phone = auth.currentUser.phoneNumber;
+    database.ref(`users/${auth.currentUser.uid}`).update({
+      name,
+      address,
+    })
     database.ref(`orders/${auth.currentUser.uid}`).push({
       products,
       date: firebase.database.ServerValue.TIMESTAMP,
@@ -144,21 +149,23 @@ export const Cart = ({ products = {} }) => {
       name,
       address,
       comment,
+    }).then(snap => 
+      database.ref(`orders/${auth.currentUser.uid}/${snap.key}/date`).get()
+    ).then(snap => {
+      console.log()
+      database.ref(`carts/${auth.currentUser.uid}`).set(null)
+      const date = snap.val()
+      const timestamp = new Date(date).toLocaleString('ru-RU', dateRuConfig);
+      setPlacedOrderId(date)
+      setPayDetails({timestamp, phone, total})
+      openModal();
     })
-    database.ref(`users/${auth.currentUser.uid}`).update({
-      name,
-      address,
-    })
-    database.ref(`carts/${auth.currentUser.uid}`).set(null)
-    const timestamp = new Date().toLocaleString('ru-RU', dateRuConfig);
-    setPayDetails({timestamp, phone, total})
-    openModal();
   }, [products, name, address, comment])
 
   return (
     <Root>
       <PageTitle>Корзина</PageTitle>
-      <QRModal isOpened={isQRModalOpened} id={'12'} onClose={closeModal} first details={payDetails} />
+      <QRModal isOpened={isQRModalOpened} id={placedOrderId} onClose={closeModal} first details={payDetails} />
       <Table>
         <thead>
           <tr>
