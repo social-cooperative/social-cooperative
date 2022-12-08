@@ -531,3 +531,31 @@ export const productsTotal = products => {
     products = Object.values(products)
   return products.reduce((acc, v) => acc += v.count * v.product.price, 0)
 }
+
+const requisites = {
+  Name: 'ПК "СОЦКООП"',
+  PersonalAcc: '40703810901500002456',
+  BankName: 'ТОЧКА ПАО БАНКА "ФК ОТКРЫТИЕ"',
+  BIC: '044525999',
+  CorrespAcc: '30101810845250000999',
+  PayeeINN: '9715431330',
+  KPP: '771501001',
+};
+
+export interface IPayDetails {
+  total: string;
+  phone: string;
+  timestamp: string;
+}
+
+export const createQRLink = ({total, timestamp, phone}: IPayDetails) => {
+  return `http://createqr.ru/invoice?${Object.entries(requisites).map(item => item.join('=')).join('&')}&SumRub=${total}&Purpose=Заказ от ${timestamp} ${phone}`;
+}
+
+export const dateRuConfig = {
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+} as any
