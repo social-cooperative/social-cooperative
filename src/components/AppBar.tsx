@@ -27,9 +27,8 @@ import { useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 
 const AppToolbar = styled(Toolbar)`
-  backdrop-filter: blur(8px);
-  background: rgba(231, 247, 235, 0.8);
   top: 0;
+  background-color: white;
 `
 
 const A = styled.a`
@@ -95,15 +94,11 @@ export default () => {
     <AppBar position="sticky" color="transparent">
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
-          <a href="/store">
-            <img style={{ cursor: 'pointer', height: 37 }} src="logo.png" />
-          </a>
-          <Typography variant="h4" style={{ flexGrow: 1, marginLeft: '1em', color: 'rgba(0,0,0,0.9)', fontFamily: '"Journal Sans New", Roboto' }}>
-            <A href="/store">
-              СоцКооп
-            </A>
-          </Typography>
-
+          <div style={{ flexGrow: 1, marginLeft: '1em'}}>
+            <a href="/" >
+              <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
+            </a>
+          </div>
           <IconButton href="/store">
             <StoreIcon />
           </IconButton>

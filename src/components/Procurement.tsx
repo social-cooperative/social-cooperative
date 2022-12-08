@@ -1,19 +1,13 @@
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import SkipNextIcon from '@mui/icons-material/SkipNext'
 import styled from 'styled-components'
-import DeleteIcon from '@mui/icons-material/Delete'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import React from 'react'
-
-import { auth, database } from '../firebase'
-import { Table, CellImg } from './Table'
+import { productsTotal, subscribe, useSelector, useToggle } from '../utils'
+import { database } from '../firebase'
+import { Table } from './Table'
+import { Order } from './Orders'
+import PageTitle from './PageTitle'
+import { categorize } from './ProductList'
 
 const Root = styled.div`
   padding: 1em;
@@ -22,9 +16,6 @@ const Root = styled.div`
 const adminSelector = store => !!store.claims.admin
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
-
-import { log, productsTotal, subscribe, useCounter, useSelector, useToggle } from '../utils'
-import { useCallback, useEffect, useState } from 'react'
 
 const useProcurement = () => {
   const [orders, setOrders] = useState({})
@@ -62,12 +53,6 @@ const dateRuConfig = {
   minute: '2-digit'
 } as any
 
-import { Order } from './Orders'
-import PageTitle from './PageTitle'
-import { categorize } from './ProductList'
-
-
-
 const useProducts = orders => {
   const users = Object.values<any>(orders)
   const products = {}
@@ -98,8 +83,8 @@ const ByProductProduct = ({ product, darker }) => (
     <td><Typography>{product.name}</Typography></td>
     <td><Typography>{product.unit}</Typography></td>
     <td><Typography>{product.price}</Typography></td>
-    <td><Typography>{product.unit} x{product.count}</Typography></td>
-    <td><Typography>{product.price * product.count}р.</Typography></td>
+    <td><Typography>{product.count}</Typography></td>
+    <td><Typography>{product.price * product.count}</Typography></td>
   </tr>
 )
 

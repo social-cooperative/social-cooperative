@@ -1,22 +1,156 @@
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import SkipNextIcon from '@mui/icons-material/SkipNext'
 import styled from 'styled-components'
 
 import { auth, database, storage } from '../firebase'
-import { Table, CellImg } from './Table'
+import { CellImg } from './Table'
 
 const Root = styled.div`
   padding: 1em;
+
+  button {
+    cursor: pointer;
+    transition: 0.2s ease-in opacity;
+  }
+
+  button:hover {
+    opacity: 0.8;
+  }
+
+  .category {
+    text-align: center;
+    background-color: #239F2328;
+    color: #239F23;
+    padding: 12px 0;
+    font-size: 32px;
+    font-weight: 600; 
+  }
+
+  .product-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 24px;
+    margin: 24px 0;
+  }
+
+  @media (min-width: 996px) {
+    .product-list {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .product {
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+  }
+
+  .product-section {
+    margin-bottom: 24px;
+  }
+
+  .product-header {
+    margin-bottom: auto;
+  }
+
+  .product-section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 8px;
+  }
+
+  .product-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #e74c3c;
+    border: 0;
+    border-radius: 3px;
+    padding: 5px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .product-image {
+    height: 280px;
+    overflow: hidden;
+  }
+
+  .product-body {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    flex-grow: 1;
+  }
+
+  .product-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2e2e38;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+
+  .product-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #8a8a8a; 
+    margin-bottom: 6px;
+  }
+
+  .product-counter {
+    display: grid;
+    grid-template-columns: 32px 64px 32px;
+    grid-template-rows: 32px;
+    grid-gap: 4px;
+  }
+
+  .product-counter button {
+    border: 0;
+    border-radius: 3px;
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .product-counter input {
+    display: block;
+    text-align: center;
+    border: 2px #8a8a8a solid;
+    border-radius: 4px;
+  }
+
+  .product-counter button:first-of-type {
+    background-color: #e67e22;
+  }
+
+  .product-counter button:last-of-type {
+    background-color: #60CE60;
+  }
+
+  .product-price {
+    font-size: 24px;
+    font-weight: 600;
+    color: #239F23;
+  }
+
+  .product-buy {
+    background-color: #239F23;
+    border: 0;
+    cursor: pointer;
+    text-transform: uppercase;
+    color: white;
+    font-size: 15px;
+    padding: 20px;
+  }
 `
 
-const truncate = (str, n) => str.length <= n ? str : str.substring(0, n + 1) + '...'
+const truncate = (str: string | undefined, n: number) => {
+  if (!str) return '';
+  return str.length <= n ? str : str.substring(0, n + 1) + '...'
+}
 
 const adminSelector = store => !!store.claims.admin
 
@@ -52,61 +186,76 @@ const Product = props => {
     })
   }, [count, model])
 
-  const canBuy = !!model.price
+  const canBuy = !!model.price  
 
   return (
-    <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
-      <td className="image">
+    <article className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
+      <div className="product-image">
         <FirebaseImageUploader src={model.image} saveAs={`products/${model.id}`} databasePath={`/products/${model.id}/image`} component={CellImg} enabled={edit} />
-      </td><td>
-        <Typography variant="h6">
-          <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
-        </Typography>
-      </td><td>
-        <Typography variant="h6">
-          <FirebaseEditorField path={`/products/${model.id}/price`} value={model.price} enabled={edit} number>
-            {price => price ? String(price).replace('.', ',') + 'р.' : '-'}
-          </FirebaseEditorField>
-        </Typography>
-      </td><td>
-        <Typography variant="h6">
-          <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={edit} />
-        </Typography>
-      </td><td>
-        <Typography>
-          <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={edit} />
-        </Typography>
-        {edit ? (
-          <Typography>
+      </div>
+      <div className="product-body">
+      {
+        !edit && 
+        <React.Fragment>
+          <header className='product-header'>
+            <p className='product-title'>{model.name}</p>
+            {model.comment && <p>{model.comment}</p>}
+          </header>
+          <div className='product-section product-section-grid'>
+            <div>
+              <p className='product-label'>фасовка:</p>
+              <p>{model.unit || '-'}</p>
+            </div>
+            {model.link && 
+              <div>
+                <p className='product-label'>ссылка на отзыв:</p>
+                <a href={model.link}>Подробнее</a>
+              </div>
+            }
+          </div>
+          <footer className='product-section product-section-grid'>
+            <p className='product-price'>{model.price ? String(model.price).replace('.', ',') + ' ₽' : '-'}</p>
+            <div className='product-counter'>
+              <button disabled={!canBuy} onClick={decCount}>-</button>
+              <input disabled={!canBuy} size={11} style={{ display: 'block', textAlign: 'center' }} value={canBuy ? count : 'Нет в наличии'} readOnly />
+              <button disabled={!canBuy} onClick={incCount}>+</button>
+            </div>
+          </footer>
+        </React.Fragment>
+      }{
+        edit && 
+        <React.Fragment>
+          <div className='product-section'>
+            <p className='product-label'>название:</p>
+            <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>комментарий / описание:</p>
+            <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>фасовка:</p>
+            <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>ссылка на отзыв:</p>
             <FirebaseEditorField path={`/products/${model.id}/link`} value={model.link} enabled={edit}>
-              {v => truncate(v, 20)}
+              {link => link ? truncate(link, 20) : '-'}
             </FirebaseEditorField>
-          </Typography>
-        ) : (model.link &&
-          <Typography>
-            <a href={model.link}>Подробнее</a>
-          </Typography>
-        )
-        }
-      </td>{admin && <td>
-        <Typography>
-          <FirebaseEditorField path={`/products/${model.id}/commentInternal`} value={model.commentInternal} enabled={edit} />
-        </Typography>
-      </td>}{!edit && <td>
-        <input disabled={!canBuy} size={11} style={{ display: 'block', textAlign: 'center' }} value={canBuy ? count : 'Нет в наличии'} readOnly />
-        <div style={{ display: 'flex' }}>
-          <button disabled={!canBuy} style={{ width: 25 }} onClick={incCount}>+</button>
-          <button disabled={!canBuy} style={{ width: 25 }} onClick={decCount}>-</button>
-          <button disabled={!canBuy} style={{ flex: 1 }} onClick={addToBasket}><small>В корзину</small></button>
-        </div>
-      </td>}{edit && <td>
-        <button onClick={deleteProduct}>🗑️</button>
-      </td>}
-    </tr>
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>цена:</p>
+            <FirebaseEditorField path={`/products/${model.id}/price`} value={model.price} enabled={edit} number />
+          </div>
+        </React.Fragment>
+      }
+      </div>
+      {!edit && <button disabled={!canBuy} className='product-buy' onClick={addToBasket}>В корзину</button>}
+      {edit && <button className='product-remove' onClick={deleteProduct}>Удалить товар</button>}
+    </article>
   )
 }
 
-import products from '../products'
 import { hash, log, subscribe, useCounter, useSelector, useToggle } from '../utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import FirebaseEditorField from './FirebaseEditorField'
@@ -161,7 +310,7 @@ const overwriteProducts = () => {
     .then(() => Promise.all(products.map(product =>
       database.ref('products').push(product)
     )))
-    .then(() => alert('Говто'))
+    .then(() => alert('Готово'))
 }
 
 export default () => {
@@ -178,39 +327,24 @@ export default () => {
         {edit && <button style={{ float: 'right' }} onClick={overwriteProducts}>🗃️</button>}
         {edit && <button style={{ float: 'right' }} onClick={addProduct()}>➕</button>}
       </PageTitle>
-      <Table>
-        <thead>
-          <tr>
-            <td><Typography>Фото</Typography></td>
-            <td><Typography>Наименование</Typography></td>
-            <td><Typography>Цена</Typography></td>
-            <td><Typography>Ед. изм.</Typography></td>
-            <td><Typography>Комментарий</Typography></td>
-            {admin && <td><Typography>Внутренний комментарий</Typography></td>}
-            {!edit && <td><Typography>В корзину</Typography></td>}
-            {edit && <td></td>}
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(products).map(([category, products]) =>
-            <React.Fragment key={category}>
-              <tr className="category"><td colSpan={100}>
-                <Typography variant="h5">
-                  <CategoryEditorField category={category} products={products} enabled={edit} />
-                  {edit && <button style={{ float: 'right' }} onClick={addProduct(category)}>➕</button>}
-                </Typography>
-              </td></tr>
+      <section>
+        {Object.entries(products).map(([category, products]) =>
+          <React.Fragment key={category}>
+            <div className="category">
+              <CategoryEditorField category={category} products={products} enabled={edit} />
+              {edit && <button style={{ float: 'right' }} onClick={addProduct(category)}>➕</button>}
+            </div>
+            <div className='product-list'>
               {products.map((p, i) => <Product
                 key={p.id}
                 model={p}
-                darker={i % 2}
                 admin={admin}
                 edit={edit}
               />)}
-            </React.Fragment>
-          )}
-        </tbody>
-      </Table>
+            </div>
+          </React.Fragment>
+        )}
+      </section>
     </Root>
   )
 }
