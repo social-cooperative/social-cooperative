@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography'
 import styled from 'styled-components'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { productsTotal, subscribe, useSelector, useToggle } from '../utils'
+import { productsTotal, subscribe, toCurrencyStringRu, useSelector, useToggle } from '../utils'
 import { database } from '../firebase'
 import { Table } from './Table'
 import { Order } from './Orders'
@@ -44,14 +44,6 @@ export default () => {
   ), [])
   return admin ? <Orders orders={orders} /> : null
 }
-
-const dateRuConfig = {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-} as any
 
 const useProducts = orders => {
   const users = Object.values<any>(orders)
@@ -95,7 +87,7 @@ const ByProducts = ({ orders }) => {
       <React.Fragment key={category}>
         <tr className="category">
           <td colSpan={100} style={{ background: '#bae5c6' }}>
-            <Typography variant="h6">{category}, всего на <b>{ru.format(total)}</b></Typography>
+            <Typography variant="h6">{category}, всего на <b>{toCurrencyStringRu(total)}</b></Typography>
           </td>
         </tr>
         {products.map((product, i) =>
@@ -147,7 +139,7 @@ export const Orders = ({ orders = {} }) => {
                     <Typography variant="h5">
                       Пользователь <b>{Object.values<any>(orders)[0]?.phone}</b>,
                       заказов: {Object.values(orders).length},
-                      на сумму: <b>{ru.format(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}</b>
+                      на сумму: <b>{toCurrencyStringRu(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}</b>
                     </Typography>
                   </td>
                 </tr>
@@ -166,7 +158,7 @@ export const Orders = ({ orders = {} }) => {
             <tr className="category no-center">
               <td colSpan={100}>
                 <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} >
-                  <Typography variant="h5">Закрыть закупку на {ru.format(total)}</Typography>
+                  <Typography variant="h5">Закрыть закупку на {toCurrencyStringRu(total)}</Typography>
                 </button>
               </td>
             </tr>

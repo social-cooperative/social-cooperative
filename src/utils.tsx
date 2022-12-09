@@ -27,21 +27,21 @@ export const log = (...args) => (console.log(...args), args[0])
 
 export function dateAdd(date, interval, units) {
   if (!(date instanceof Date))
-    return undefined;
-  var ret = new Date(date); //don't change original date
-  var checkRollover = function () { if (ret.getDate() != date.getDate()) ret.setDate(0); };
+    return undefined
+  let ret = new Date(date) //don't change original date
+  const checkRollover = function () { if (ret.getDate() != date.getDate()) ret.setDate(0) }
   switch (String(interval).toLowerCase()) {
-    case 'year': ret.setFullYear(ret.getFullYear() + units); checkRollover(); break;
-    case 'quarter': ret.setMonth(ret.getMonth() + 3 * units); checkRollover(); break;
-    case 'month': ret.setMonth(ret.getMonth() + units); checkRollover(); break;
-    case 'week': ret.setDate(ret.getDate() + 7 * units); break;
-    case 'day': ret.setDate(ret.getDate() + units); break;
-    case 'hour': ret.setTime(ret.getTime() + units * 3600000); break;
-    case 'minute': ret.setTime(ret.getTime() + units * 60000); break;
-    case 'second': ret.setTime(ret.getTime() + units * 1000); break;
-    default: ret = undefined; break;
+    case 'year': ret.setFullYear(ret.getFullYear() + units); checkRollover(); break
+    case 'quarter': ret.setMonth(ret.getMonth() + 3 * units); checkRollover(); break
+    case 'month': ret.setMonth(ret.getMonth() + units); checkRollover(); break
+    case 'week': ret.setDate(ret.getDate() + 7 * units); break
+    case 'day': ret.setDate(ret.getDate() + units); break
+    case 'hour': ret.setTime(ret.getTime() + units * 3600000); break
+    case 'minute': ret.setTime(ret.getTime() + units * 60000); break
+    case 'second': ret.setTime(ret.getTime() + units * 1000); break
+    default: ret = undefined; break
   }
-  return ret;
+  return ret
 }
 
 export const sleep = ms => new Promise(r => setTimeout(r, ms))
@@ -377,6 +377,7 @@ export const proxy_events = (source: TinyEventEmitter, dest: TinyEventEmitter, .
 
 import { useSelector as _useSelector, shallowEqual, useStore } from 'react-redux'
 import { defaultClassName } from 'react-mapbox-gl/lib/popup'
+import { database } from './firebase'
 
 export function useSelector(selector = identity, comparator: typeof shallowEqual | false = shallowEqual) {
   return _useSelector(selector, comparator || refEqual)
@@ -511,14 +512,14 @@ export const useCounter = (initial, min = -Infinity, max = Infinity) => {
 }
 
 export const hash = str => {
-  var hash = 0, i, chr
+  let hash = 0, i, chr
   if (str.length === 0) return hash
   for (i = 0; i < str.length; i++) {
     chr = str.charCodeAt(i)
     hash = ((hash << 5) - hash) + chr
     hash |= 0 // Convert to 32bit integer
   }
-  return hash;
+  return hash
 }
 
 
@@ -532,32 +533,93 @@ export const productsTotal = products => {
   return products.reduce((acc, v) => acc += v.count * v.product.price, 0)
 }
 
-const getDetails = ({total, timestamp, phone}: IPayDetails) => ({
-  Name: 'ПК "СОЦКООП"',
-  PersonalAcc: '40703810901500002456',
-  BankName: 'ТОЧКА ПАО БАНКА "ФК ОТКРЫТИЕ"',
-  BIC: '044525999',
-  CorrespAcc: '30101810845250000999',
-  PayeeINN: '9715431330',
-  KPP: '771501001',
-  Purpose: `Внесение паевого взноса №${timestamp}-${phone} на целевую программу «Совместная закупка»`,
-  SumRub: total,
-});
-
-export interface IPayDetails {
-  total: string;
-  phone: string;
-  timestamp: string;
-}
-
-export const createQRLink = (details: IPayDetails) => {
-  return `http://createqr.ru/invoice?${Object.entries(getDetails(details)).map(item => item.join('=')).join('&')}`;
-}
-
-export const dateRuConfig = {
+const dateRuConfig = {
   year: 'numeric',
   month: 'numeric',
   day: 'numeric',
   hour: '2-digit',
   minute: '2-digit'
 } as any
+
+export const toLocaleStringRu = date => {
+  if (date instanceof Date)
+    return date.toLocaleString('ru-RU', dateRuConfig)
+  else
+    return new Date(date).toLocaleString('ru-RU', dateRuConfig)
+}
+
+export const toCurrencyStringRu = num =>  new Intl.NumberFormat('ru-RU', {
+  style: 'currency',
+  currencyDisplay:'symbol',
+  currency: 'RUB'
+}).format(num).replace(',00 ₽', ' ₽')
+
+export const useFirebaseValue = (path, defaultValue = undefined, transform = identity) => {
+  const [value, setValue] = useState(defaultValue as any)
+  const ref = database.ref(path)
+  useEffect(() => subscribe(
+    ref, 'value',
+    snap => setValue(transform(snap.val()))
+  ), [path, transform])
+  return value
+}
+
+export const useFirebaseState = (path, defaultValue = undefined, transform = identity) => {
+  const [value, setValue] = useState(defaultValue as any)
+  const ref = database.ref(path)
+  useEffect(() => subscribe(
+    ref, 'value',
+    snap => setValue(transform(snap.val()))
+  ), [path, transform])
+  const set = useCallback(async newValue => {
+    if (typeof newValue === 'function')
+      return await ref.get()
+        .then(snap => snap.val())
+        .then(v => ref.set(newValue(v)))
+    else
+      return await ref.set(newValue)
+  }, [path])
+  const update = useCallback(async newValue => {
+    if (typeof newValue === 'function')
+      return await ref.get()
+        .then(snap => snap.val())
+        .then(v => ref.update(newValue(v)))
+    else
+      return await ref.update(newValue)
+  }, [path])
+  return [value, set, update]
+}
+
+export const resizeImage = (file, max_size, cb) => {
+  if (file.type.match(/image.*/)) {
+    const reader = new FileReader()
+    reader.onload = event => {
+      const image = new Image()
+      image.onload = () => {
+        const canvas = document.createElement('canvas')
+        let width = image.width
+        let height = image.height
+        if (width > height) {
+          if (width > max_size) {
+            height *= max_size / width
+            width = max_size
+          }
+        } else {
+          if (height > max_size) {
+            width *= max_size / height
+            height = max_size
+          }
+        }
+        canvas.width = width
+        canvas.height = height
+        canvas.getContext('2d').drawImage(image, 0, 0, width, height)
+        canvas.toBlob(blob =>
+          cb(new File([blob], file.name, { type: 'image/webp' }))
+        , 'image/webp')
+      }
+      //@ts-ignore
+      image.src = event.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 
 import { storage, database } from '../firebase'
-import { log, useCounter } from "../utils"
+import { log, resizeImage, useCounter } from "../utils"
 
 
 const defaultRender = src => <img src={src} />
@@ -29,8 +29,8 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
       }
     }
   }, [src, counter])
-
-  const upload = () => {
+  
+  const uploadOld = () => {
     const file = inputRef.current.files[0]
     const newPath = saveAs + file.type.replace(/.*\//, '.')
     if (file.size > 1024 * 1024 * 10) {
@@ -44,6 +44,23 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
       })
     }
   }
+
+  const upload = () => {
+    const file = inputRef.current.files[0]
+    const newPath = saveAs + '.webp'
+    if (file.size > 1024 * 1024 * 10) {
+      alert('Максимальный размер файла - 10 мегабайт')
+      inputRef.current.value = ''
+    } else {
+      resizeImage(file, 300, file => 
+        storage
+          .ref(newPath)
+          .put(file)
+          .then(() => database.ref(databasePath).set(newPath).then(incCounter))
+      )
+    }
+  }
+  
   return (
     enabled
       ? <>

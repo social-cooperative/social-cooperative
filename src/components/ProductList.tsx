@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 import { auth, database, storage } from '../firebase'
 import { CellImg } from './Table'
+import { toCurrencyStringRu, useFirebaseState, useFirebaseValue } from '../utils'
 
 const Root = styled.div`
   padding: 1em;
@@ -156,6 +157,23 @@ const adminSelector = store => !!store.claims.admin
 
 export const productSlug = model => model.id + '|' + hash(model.name + model.unit + model.price)
 
+export const addToCart = (count, model) => {
+  const slug = productSlug(model)
+  const cartRef = database.ref(`carts/${auth.currentUser.uid}`)
+  cartRef.child(slug).get().then(snap => {
+    const inCart = snap.val()
+    if (inCart) {
+      inCart.count += count
+      cartRef.child(slug).set(inCart)
+    } else {
+      cartRef.child(slug).set({
+        product: model,
+        count: count,
+      })
+    }
+  })
+}
+
 const Product = props => {
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
   const { model, edit, admin } = props
@@ -167,24 +185,7 @@ const Product = props => {
     }
   }, [model])
 
-  const addToBasket = useCallback(() => {
-    const slug = productSlug(model)
-
-    const cartRef = database.ref(`carts/${auth.currentUser.uid}`)
-
-    cartRef.child(slug).get().then(snap => {
-      const inCart = snap.val()
-      if (inCart) {
-        inCart.count += count
-        cartRef.child(slug).set(inCart)
-      } else {
-        cartRef.child(slug).set({
-          product: model,
-          count: count,
-        })
-      }
-    })
-  }, [count, model])
+  const addToBasket = useCallback(() => addToCart(count, model), [count, model])
 
   const canBuy = !!model.price  
 
@@ -214,7 +215,7 @@ const Product = props => {
             }
           </div>
           <footer className='product-section product-section-grid'>
-            <p className='product-price'>{model.price ? String(model.price).replace('.', ',') + ' ₽' : '-'}</p>
+            <p className='product-price'>{model.price ? toCurrencyStringRu(model.price) : '-'}</p>
             <div className='product-counter'>
               <button disabled={!canBuy} onClick={decCount}>-</button>
               <input disabled={!canBuy} size={11} style={{ display: 'block', textAlign: 'center' }} value={canBuy ? count : 'Нет в наличии'} readOnly />
@@ -262,6 +263,7 @@ import FirebaseEditorField from './FirebaseEditorField'
 import FirebaseImageUploader from './FirebaseImageUploader'
 import PageTitle from './PageTitle'
 import EditorField from './EditorField'
+import CurrentProcurement from './CurrentProcurement'
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
@@ -291,7 +293,7 @@ const overwriteProducts = () => {
   if (!confirm(`Вы собираетесь перезаписать базу данных продуктов, это действие невозможно отменить.\n\nВы уверены?`))
     return
   alert('Вставьте данные для перезаписи в переменную window.DATA_OVERWRITE')
-  const overwrite = window.DATA_OVERWRITE
+  const overwrite = (window as any).DATA_OVERWRITE
   console.log(overwrite)
   if (!overwrite)
     return
@@ -316,8 +318,7 @@ const overwriteProducts = () => {
 export default () => {
   const admin = useSelector(adminSelector)
   const [edit, toggleEdit] = useToggle(false)
-  const [products, setProducts] = useState([])
-  useEffect(() => subscribe(database.ref('products'), 'value', snap => setProducts(categorize(snap.val()))), [])
+  const products = useFirebaseValue('products', [], categorize)
 
   return (
     <Root>
@@ -328,7 +329,10 @@ export default () => {
         {edit && <button style={{ float: 'right' }} onClick={addProduct()}>➕</button>}
       </PageTitle>
       <section>
-        {Object.entries(products).map(([category, products]) =>
+        <CurrentProcurement edit={edit}/>
+      </section>
+      <section>
+        {Object.entries<any>(products).map(([category, products]) =>
           <React.Fragment key={category}>
             <div className="category">
               <CategoryEditorField category={category} products={products} enabled={edit} />

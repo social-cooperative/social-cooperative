@@ -1,6 +1,28 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography }from '@mui/material';
 import styled from 'styled-components';
-import { createQRLink, IPayDetails } from '../utils';
+import { toCurrencyStringRu } from '../utils';
+
+const getDetails = ({ total, timestamp, phone }: IPayDetails) => ({
+    Name: 'ПК "СОЦКООП"',
+    PersonalAcc: '40703810901500002456',
+    BankName: 'ТОЧКА ПАО БАНКА "ФК ОТКРЫТИЕ"',
+    BIC: '044525999',
+    CorrespAcc: '30101810845250000999',
+    PayeeINN: '9715431330',
+    KPP: '771501001',
+    Purpose: `Внесение паевого взноса №${timestamp}-${phone} на целевую программу «Совместная закупка»`,
+    SumRub: total,
+  })
+  
+  export interface IPayDetails {
+    total: string
+    phone: string
+    timestamp: string
+  }
+  
+  export const createQRLink = (details: IPayDetails) => {
+    return `http://createqr.ru/invoice?${Object.entries(getDetails(details)).map(item => item.join('=')).join('&')}`
+  }
 
 interface IAlertDialog {
     isOpened: boolean;
@@ -31,7 +53,7 @@ export default function QRModal({ isOpened, id, onClose, first = false, details 
         aria-describedby="alert-dialog-description"
         >
         <DialogTitle id="alert-dialog-title">
-            {`Оплата заказа №${id} от ${details.timestamp} на сумму ${details.total} ₽`}
+            {`Оплата заказа №${id} от ${details.timestamp} на сумму ${toCurrencyStringRu(details.total)}`}
         </DialogTitle>
         <DialogContent id="alert-dialog-description">
             <Root>

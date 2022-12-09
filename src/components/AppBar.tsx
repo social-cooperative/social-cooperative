@@ -21,7 +21,7 @@ import StoreIcon from '@mui/icons-material/Store'
 
 import Badge from '@mui/material/Badge'
 
-import { log, productsTotal, subscribe, useSelector } from '../utils'
+import { log, productsTotal, subscribe, toCurrencyStringRu, useSelector } from '../utils'
 import { auth, database, logoutAndReload } from '../firebase'
 import { useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
@@ -49,7 +49,7 @@ const CartValue = () => {
     snap => setCart(snap.val() || {})
   ), [])
   const total = productsTotal(cart)
-  return ru.format(total) as any
+  return toCurrencyStringRu(total) as any
 }
 
 const useProcurement = () => {
@@ -94,7 +94,7 @@ export default () => {
     <AppBar position="sticky" color="transparent">
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
-          <div style={{ flexGrow: 1, marginLeft: '1em'}}>
+          <div style={{ marginLeft: '1em'}}>
             <a href="/" >
               <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
             </a>
@@ -103,11 +103,12 @@ export default () => {
             <StoreIcon />
           </IconButton>
 
+          <div style={{ flexGrow: 1}} />
 
           {admin &&
             <A href="/procurement" title="Закупка">
               <Typography color="primary">
-                {ru.format(procurementTotal)}
+                {toCurrencyStringRu(procurementTotal)}
               </Typography>
             </A>
           }

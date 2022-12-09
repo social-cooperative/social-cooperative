@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button';
 
 import QRModal from './QRModal';
-import { dateRuConfig, productsTotal, subscribe } from '../utils'
+import { productsTotal, subscribe, toCurrencyStringRu, toLocaleStringRu } from '../utils'
 import PageTitle from './PageTitle'
 import { auth, database } from '../firebase'
 import { Table } from './Table'
@@ -35,7 +35,7 @@ export const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {model.product.price ? String(model.product.price).replace('.', ',') + ' ₽' : '-'}
+          {model.product.price ? toCurrencyStringRu(model.product.price) : '-'}
         </Typography>
       </td><td>
         <Typography>
@@ -43,7 +43,7 @@ export const Product = props => {
         </Typography>
       </td><td>
         <Typography>
-          {String(total).replace('.', ',') + ' ₽'}
+          {toCurrencyStringRu(total)}
         </Typography>
       </td>
     </tr>
@@ -77,7 +77,7 @@ export default () => {
 export const Order = ({ order, id, cancellable = false, deletable = false, actual = false }) => {
   const { products, date } = order
   const total = productsTotal(products)
-  const orderedAt = new Date(date).toLocaleString('ru-RU', dateRuConfig)
+  const orderedAt = toLocaleStringRu(date)
   const placedOrderId = date
 
   const [isQRModalOpened, setIsQRModalOpened] = useState(false)
@@ -86,7 +86,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
   const closeModal = () => { setIsQRModalOpened(false) };
 
   const cancelOrder = useCallback(() => {
-    if (cancellable && confirm(`Вы собираетесь удалить заказ пользователя ${order.name}${order.name && ' '}${order.phone} от ${orderedAt} на сумму ${ru.format(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
+    if (cancellable && confirm(`Вы собираетесь удалить заказ пользователя ${order.name}${order.name && ' '}${order.phone} от ${orderedAt} на сумму ${toCurrencyStringRu(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
       database.ref(`ordersCanceled/${order.uid}/${id}`).set(order)
         .then(() => database.ref(`orders/${order.uid}/${id}`).set(null))
         .catch(() => { })
@@ -94,7 +94,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
   }, [id, order, orderedAt, cancellable])
 
   const deleteOrder = useCallback(() => {
-    if (deletable && confirm(`Вы собираетесь удалить ваш отменённый заказ от ${orderedAt} на сумму ${ru.format(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
+    if (deletable && confirm(`Вы собираетесь удалить ваш отменённый заказ от ${orderedAt} на сумму ${toCurrencyStringRu(total)}, это действие невозможно отменить.\n\nВы уверены?`)) {
       database.ref(`ordersCanceled/${order.uid}/${id}`).set(null)
         .catch(() => { })
     }
@@ -114,7 +114,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
         {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
         {deletable && <button style={{ float: 'right' }} onClick={deleteOrder}>🗑️</button>}
         <Typography variant="h6">
-          Заказ от <b>{orderedAt}</b> на сумму <b>{ru.format(total)}</b>
+          Заказ от <b>{orderedAt}</b> на сумму <b>{toCurrencyStringRu(total)}</b>
         </Typography>
         {!!order.name && <Typography align="left">
           {order.name}
