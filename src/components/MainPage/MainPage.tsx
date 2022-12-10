@@ -1,6 +1,33 @@
+import { CircularProgress } from '@mui/material';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+
+import { useFirebaseState } from '../../utils';
 import Root from './MainPage.style';
 
+dayjs.extend(localizedFormat)
+
+const locilizeDate = (date: number | string | Date) => dayjs(date).locale('ru').format('DD MMMM, dddd, HH:mm');
+const now = Date.now();
+const previewConfig = {
+  title: 'Новая совместная закупка уже скоро!',
+  subtitle: 'Дата пока не назначена, следите за обновлениями в телеграм-канале',
+  date: null as string | null,
+};
+
 export default function MainPage() {
+  const [{ startDate = 0, endDate = 0 }] = useFirebaseState('/currentProcurement', {});
+
+  if (now < startDate) {
+    previewConfig.subtitle = 'Дата начала:'
+    previewConfig.date = locilizeDate(startDate);
+  } else if (now < endDate) {
+    previewConfig.title = 'Совместная закупка уже идёт!'
+    previewConfig.subtitle = 'Дата окончания:'
+    previewConfig.date = locilizeDate(endDate);
+  } 
+
   return (
     <>
       <Root>
@@ -9,12 +36,23 @@ export default function MainPage() {
             <img src='/logo.svg' alt='' height='37' />
           </header>
           <section className='preview'>
+            {startDate === 0 && 
+              <div className='preview-overlay'>
+                <CircularProgress color="inherit" />
+              </div>
+            }
             <div className='preview-container'>
-              <h1 className='preview-heading'>Очередная закупка уже скоро!</h1>
-              <p>Начало:</p>
-              <h2 className='preview-subheading'>
-                11 декабря, воскресенье, 09:00
-              </h2>
+              <h1 className='preview-heading'>
+                {previewConfig.title}
+              </h1>
+              <p>
+                {previewConfig.subtitle}
+              </p>
+              {previewConfig.date && 
+                <h2 className='preview-subheading'>
+                  {previewConfig.date}
+                </h2>
+              }
               <a className='preview-button' href='/store'>Посмотреть склад</a>
             </div>
           </section>

@@ -31,9 +31,12 @@ const CurrentProcurement = ({ edit = false }) => {
     <Typography variant="h6" style={{marginBottom: '1em'}}>
       {edit ? (
         <>
-          <table>
+          <table style={{borderSpacing: '0 12px'}}>
             <tbody>
-              <tr><td>Минимальная сумма закупки:</td><td><input value={minCartTotal} onChange={setMinCartTotal} size={11} /> ₽</td></tr>
+              <tr><td>
+                <p>Минимальная сумма закупки:</p>
+                <input value={minCartTotal} onChange={setMinCartTotal} size={11} /> ₽
+              </td></tr>
               <tr><td>    
                 <DateTimePicker value={startDate} onChange={setStartDate} label="Начало закупки" />
               </td></tr>

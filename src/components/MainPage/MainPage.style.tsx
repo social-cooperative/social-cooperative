@@ -77,6 +77,20 @@ export default styled.div`
     padding: 30px 0;
     background-color: #60ce60;
     margin-bottom: 32px;
+    min-height: 248px;
+    position: relative;
+  }
+  .preview-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #60ce60;
   }
   .preview-heading {
     font-weight: 800;
@@ -90,17 +104,18 @@ export default styled.div`
     margin-bottom: 18px;
   }
   .preview-button {
+    margin-top: 24px;
     background-color: white;
     border: 0;
     border-radius: 4px;
     color: #239f23;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 17px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 8px 12px;
+    padding: 12px 14px;
     font-family: 'Inter', sans-serif;
     text-transform: uppercase;
     cursor: pointer;
