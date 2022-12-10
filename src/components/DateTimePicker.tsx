@@ -3,6 +3,7 @@ import { TextField } from '@mui/material'
 import { AdapterDayjs, } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import 'dayjs/locale/ru';
+import dayjs from 'dayjs';
 
 interface IBasicDateTimePicker {
   value: number;
@@ -15,7 +16,7 @@ interface IDateTimePickerValue {
 }
 
 export default function BasicDateTimePicker({value, onChange, label}: IBasicDateTimePicker) {
-  const onChangeHandler = useCallback((val: IDateTimePickerValue) => onChange(Number(val.$d)), [onChange])
+  const onChangeHandler = useCallback((val: dayjs.Dayjs) => onChange(Number(val.valueOf())), [onChange])
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
       <DateTimePicker
