@@ -1,9 +1,9 @@
-import { log, toCurrencyStringRu, toLocaleStringRu, useFirebaseState } from '../utils'
-
-import Typography from '@mui/material/Typography'
-import InputDate from './InputDate'
 import { useCallback } from 'react'
+import { Typography } from '@mui/material'
+
+import DateTimePicker from './DateTimePicker'
 import { database } from '../firebase'
+import { toCurrencyStringRu, toLocaleStringRu, useFirebaseState } from '../utils'
 
 const resetAllCarts = () => {
   if (confirm(`Вы собираетесь очистить все корзины карзины всех пользователей, это действие невозможно отменить.\n\nВы уверены?`)) {
@@ -20,8 +20,8 @@ const CurrentProcurement = ({ edit = false }) => {
     minCartTotal
   }, set, update] = useFirebaseState('/currentProcurement', {})
   const setMinCartTotal = useCallback(e => update({ 'minCartTotal': +e.target.value }), [])
-  const setStartDate = useCallback(v => update({ 'startDate': v }), [])
-  const setEndDate = useCallback(v => update({ 'endDate': v }), [])
+  const setStartDate = useCallback((v: number) => update({ 'startDate': v }), [])
+  const setEndDate = useCallback((v: number) => update({ 'endDate': v }), [])
   const now = Date.now()
   const upcoming = now < startDate
   const activeNow = !upcoming && now < endDate
@@ -34,8 +34,12 @@ const CurrentProcurement = ({ edit = false }) => {
           <table>
             <tbody>
               <tr><td>Минимальная сумма закупки:</td><td><input value={minCartTotal} onChange={setMinCartTotal} size={11} /> ₽</td></tr>
-              <tr><td>Начало:</td><td><InputDate value={startDate} onChnage={setStartDate} /></td></tr>
-              <tr><td>Окончание:</td><td><InputDate value={endDate} onChnage={setEndDate} /></td></tr>
+              <tr><td>    
+                <DateTimePicker value={startDate} onChange={setStartDate} label="Начало закупки" />
+              </td></tr>
+              <tr><td>    
+                <DateTimePicker value={endDate} onChange={setEndDate} label="Окончание закупки" />
+              </td></tr>
             </tbody>
           </table>
           {incorrect && <b style={{ color: 'red' }}>Дата окончания закупки раньше даты начала!</b>}
