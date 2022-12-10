@@ -195,7 +195,6 @@ export const Cart = ({ products = {} }) => {
     }).then(snap =>
       database.ref(`orders/${auth.currentUser.uid}/${snap.key}/date`).get()
     ).then(snap => {
-      console.log()
       database.ref(`carts/${auth.currentUser.uid}`).set(null)
       const date = snap.val()
       const timestamp = toLocaleStringRu(date)
@@ -254,16 +253,6 @@ export const Cart = ({ products = {} }) => {
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
                       <input placeholder="Комментарий к заказу" value={comment} onChange={setComment} style={{ flex: 1 }} />
                     </div>
-                    {/*!cartTotalValid &&
-                      <React.Fragment>
-                        <Typography style={{ marginTop: '8px', fontWeight: 600 }}>
-                          К сожалению, возможность сделать заказ на сумму меньше {minCartTotal} ₽ рублей временно недоступна.
-                        </Typography>
-                        <Typography style={{ marginTop: '8px', marginBottom: '8px' }}>
-                          Вы можете либо увеличить сумму заказа, либо скооперироваться с другими людьми и объединить ваши заказы для набора нужной суммы.
-                        </Typography>
-                      </React.Fragment>
-                    */}
                     <CurrentProcurement />
                     {activeNow && !!frozenProductsList.length &&
                       <Typography style={{ marginBottom: '1em' }} align="center">
@@ -272,7 +261,7 @@ export const Cart = ({ products = {} }) => {
                       </Typography>
                     }
                     <button disabled={!(name && address && cartTotalValid && activeNow && !frozenProductsList.length)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
-                      Заказать на сумму {toCurrencyStringRu(total)}
+                      Внести пай на сумму {toCurrencyStringRu(total)}
                     </button>
                     <Typography style={{ marginTop: '1em' }}>
                       * Если вы покупаете у нас в первый раз, вам понадобится подписать заявление на вступление в наш кооператив и согласие на обработку персональных данных в соответствие закона 152-ФЗ. Эти документы привезёт курьер при первой доставке. Не забудьте паспорт

@@ -120,47 +120,74 @@ export default styled.div`
   .page-section {
     display: flex;
     justify-content: space-between;
-  }
+    flex-direction: column;
+ }
+  @media (min-width: 981px) {
+    .page-section {
+      flex-direction: row;
+   }
+ }
   .page-section h2 {
     font-weight: 800;
     font-size: 36px;
     line-height: 44px;
     color: #239f23;
     margin-bottom: 20px;
-  }
+ }
   .page-section p {
     margin-bottom: 26.1px;
     letter-spacing: 0.04px;
-  }
-  .page-section p:last-of-type {
-    margin-bottom: 39.15px;
-  }
+ }
+  @media (min-width: 981px) {
+    .page-section p:last-of-type {
+      margin-bottom: 39.15px;
+   }
+ }
   .page-section-content {
     width: 100%;
-    max-width: 600px;
-  }
+    max-width: 800px;
+ }
+  @media (min-width: 981px) {
+    .page-section-content {
+      max-width: 600px;
+   }
+ }
   .page-section-aside {
     width: 100%;
     max-width: 318px;
     flex-grow: 0;
-  }
+    margin-bottom: 40px;
+ }
+  @media (min-width: 981px) {
+    .page-section-aside {
+      margin-bottom: 0;
+      justify-content: end;
+      align-items: baseline;
+      display: flex;
+   }
+ }
   .page-section-aside.out-of-order {
     margin-top: -380px;
-  }
+ }
   .page-section-aside img {
     display: block;
     max-width: 100%;
-  }
+ }
   .qr-item {
     display: flex;
     flex-direction: column;
     width: 260px;
     text-align: center;
-  }
+ }
   .qr-item-label {
     font-weight: 400;
-    font-size: 14px;
+    font-size: 18px;
     line-height: 1.35;
     color: #64646d;
-  }
+ }
+  @media (min-width: 981px) {
+    .qr-item-label {
+      font-size: 14px;
+   }
+ }
 `
