@@ -178,12 +178,15 @@ export const Cart = ({ products = {} }) => {
   const now = Date.now()
   const activeNow = now > startDate && now < endDate
 
-  const placeOrder = useCallback(() => {
-    const phone = auth.currentUser.phoneNumber
+  const changeNameAndAddressInDB = useCallback(() => {
     database.ref(`users/${auth.currentUser.uid}`).update({
       name,
       address,
     })
+  }, [name, address])
+
+  const placeOrder = useCallback(() => {
+    const phone = auth.currentUser.phoneNumber
     database.ref(`orders/${auth.currentUser.uid}`).push({
       products,
       date: firebase.database.ServerValue.TIMESTAMP,
@@ -247,11 +250,11 @@ export const Cart = ({ products = {} }) => {
                 <td colSpan={100}>
                   <Typography variant="h5" component="div">
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
-                      <input placeholder="Ф.И.О." value={name} onChange={setName} style={{ flex: 1, marginRight: '0.5em' }} />
-                      <input placeholder="Адрес" value={address} onChange={setAddress} style={{ flex: 1 }} />
+                      <input placeholder="Ф.И.О." value={name} onChange={setName} style={{ flex: 1, marginRight: '0.5em' }} onBlur={changeNameAndAddressInDB} />
+                      <input placeholder="Адрес" value={address} onChange={setAddress} style={{ flex: 1 }} onBlur={changeNameAndAddressInDB} />
                     </div>
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
-                      <input placeholder="Комментарий к заказу" value={comment} onChange={setComment} style={{ flex: 1 }} />
+                      <input placeholder="Комментарий" value={comment} onChange={setComment} style={{ flex: 1 }} />
                     </div>
                     <CurrentProcurement />
                     {activeNow && !!frozenProductsList.length &&

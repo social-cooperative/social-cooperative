@@ -6,11 +6,7 @@ export default function MainPage() {
       <Root>
         <div className='main-page'>
           <header className='header'>
-            <nav className='header-container'>
-              <a href='#' className='header-icon'>
-                <img src='/logo.svg' alt='' height='37' />
-              </a>
-            </nav>
+            <img src='/logo.svg' alt='' height='37' />
           </header>
           <section className='preview'>
             <div className='preview-container'>
@@ -19,7 +15,7 @@ export default function MainPage() {
               <h2 className='preview-subheading'>
                 11 декабря, воскресенье, 09:00
               </h2>
-              <a className='preview-button'>В магазин</a>
+              <a className='preview-button' href='/store'>Посмотреть склад</a>
             </div>
           </section>
           <main className='main-page-content'>
