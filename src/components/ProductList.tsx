@@ -294,14 +294,14 @@ const overwriteProducts = () => {
     return
   alert('Вставьте данные для перезаписи в переменную window.DATA_OVERWRITE')
   const overwrite = (window as any).DATA_OVERWRITE
-  console.log(overwrite)
+  console.warn(overwrite)
   if (!overwrite)
     return
   let products = []
   try {
     products = JSON.parse(overwrite)
   } catch (err) {
-    console.log(err)
+    console.warn(err)
     alert('Неправильный формат данных')
     return
   }

@@ -39,7 +39,7 @@ export default function UnderConstruction() {
             href="/store"
             sx={{ marginTop: '1em' }}
           >
-            В магазин
+            На склад
           </Button>
         </div>
       </ShiedInner>

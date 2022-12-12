@@ -77,6 +77,20 @@ export default styled.div`
     padding: 30px 0;
     background-color: #60ce60;
     margin-bottom: 32px;
+    min-height: 248px;
+    position: relative;
+  }
+  .preview-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #60ce60;
   }
   .preview-heading {
     font-weight: 800;
@@ -90,17 +104,18 @@ export default styled.div`
     margin-bottom: 18px;
   }
   .preview-button {
+    margin-top: 24px;
     background-color: white;
     border: 0;
     border-radius: 4px;
     color: #239f23;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 17px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 8px 12px;
+    padding: 12px 14px;
     font-family: 'Inter', sans-serif;
     text-transform: uppercase;
     cursor: pointer;
@@ -120,47 +135,74 @@ export default styled.div`
   .page-section {
     display: flex;
     justify-content: space-between;
-  }
+    flex-direction: column;
+ }
+  @media (min-width: 981px) {
+    .page-section {
+      flex-direction: row;
+   }
+ }
   .page-section h2 {
     font-weight: 800;
     font-size: 36px;
     line-height: 44px;
     color: #239f23;
     margin-bottom: 20px;
-  }
+ }
   .page-section p {
     margin-bottom: 26.1px;
     letter-spacing: 0.04px;
-  }
-  .page-section p:last-of-type {
-    margin-bottom: 39.15px;
-  }
+ }
+  @media (min-width: 981px) {
+    .page-section p:last-of-type {
+      margin-bottom: 39.15px;
+   }
+ }
   .page-section-content {
     width: 100%;
-    max-width: 600px;
-  }
+    max-width: 800px;
+ }
+  @media (min-width: 981px) {
+    .page-section-content {
+      max-width: 600px;
+   }
+ }
   .page-section-aside {
     width: 100%;
     max-width: 318px;
     flex-grow: 0;
-  }
+    margin-bottom: 40px;
+ }
+  @media (min-width: 981px) {
+    .page-section-aside {
+      margin-bottom: 0;
+      justify-content: end;
+      align-items: baseline;
+      display: flex;
+   }
+ }
   .page-section-aside.out-of-order {
     margin-top: -380px;
-  }
+ }
   .page-section-aside img {
     display: block;
     max-width: 100%;
-  }
+ }
   .qr-item {
     display: flex;
     flex-direction: column;
     width: 260px;
     text-align: center;
-  }
+ }
   .qr-item-label {
     font-weight: 400;
-    font-size: 14px;
+    font-size: 18px;
     line-height: 1.35;
     color: #64646d;
-  }
+ }
+  @media (min-width: 981px) {
+    .qr-item-label {
+      font-size: 14px;
+   }
+ }
 `
