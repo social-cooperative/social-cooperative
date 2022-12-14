@@ -85,12 +85,13 @@ const adminSelector = store => !!store.claims.admin
 const Pathnames = () => {
   const pathname = location.pathname.slice(1)
   const admin = useSelector(adminSelector)
+  const params = Object.fromEntries(new URLSearchParams(location.search))
 
   switch (pathname) {
     case 'cart': return <Cart />
     case 'orders': return <Orders />
     case 'store': return <ProductList />
-    case 'procurement': return admin ? <Procurement /> : <ProductList />
+    case 'procurement': return admin ? <Procurement {...params} /> : <ProductList />
     default: return <>
       <ProductList />
     </>

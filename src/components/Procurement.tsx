@@ -17,12 +17,21 @@ const adminSelector = store => !!store.claims.admin
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
-const useProcurement = () => {
+const useProcurement = ({ historical, start, end }) => {
+  const needsFilter = start !== 0 || end !== Infinity
   const [orders, setOrders] = useState({})
   useEffect(() => subscribe(
-    database.ref('orders'),
+    database.ref(historical ? 'ordersHistory' : 'orders'),
     'value',
-    snap => setOrders(snap.val() || {})
+    snap => {
+      const val = snap.val() || {}
+      if (needsFilter)
+        for (const uid in val)
+          for (const id in val[uid])
+            if (val[uid][id].date < start || val[uid][id].date > end)
+              delete val[uid][id]
+      setOrders(val)
+    }
   ), [])
   let total = 0
   let count = 0
@@ -31,18 +40,18 @@ const useProcurement = () => {
       total += productsTotal(orders[id][id2].products)
       count++
     }
-  return [total, count] as any
+  return [total, count, orders] as any
 }
 
-export default () => {
+export default props => {
   const admin = useSelector(adminSelector)
-  const [orders, setOrders] = useState({})
-  useEffect(() => subscribe(
-    database.ref(`orders`),
-    'value',
-    snap => setOrders(snap.val() || {})
-  ), [])
-  return admin ? <Orders orders={orders} /> : null
+  return admin && (
+    <Orders
+      historical={props.historical === ''}
+      start={props.start ? +props.start : 0}
+      end={props.end ? +props.end : Infinity}
+    />
+  )
 }
 
 const useProducts = orders => {
@@ -100,9 +109,9 @@ const ByProducts = ({ orders }) => {
 
 const sortByDate = ([ka, a], [kb, b]) => b.date - a.date
 
-export const Orders = ({ orders = {} }) => {
+export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
   const [byProducts, toggleByProducts] = useToggle(false)
-  const [total, count] = useProcurement()
+  const [total, count, orders] = useProcurement({ historical, start, end })
   const finishProcurement = useCallback(() => {
     const procured = Date.now()
     Promise.all(Object.entries<any>(orders).map(([uid, order]) => {
@@ -149,12 +158,11 @@ export const Orders = ({ orders = {} }) => {
               </React.Fragment>
             )
           }
-          {!Object.entries<any>(orders).length
-            ?
+          {!Object.entries<any>(orders).length ? (
             <tr><td colSpan={100}>
               <Typography variant="h6" align="center">В закупке нет заказов</Typography>
             </td></tr>
-            :
+          ) : (!historical &&
             <tr className="category no-center">
               <td colSpan={100}>
                 <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} >
@@ -162,7 +170,7 @@ export const Orders = ({ orders = {} }) => {
                 </button>
               </td>
             </tr>
-          }
+          )}
         </tbody>
       </Table>
     </Root>
