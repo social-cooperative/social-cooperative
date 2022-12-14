@@ -26,10 +26,14 @@ const useProcurement = ({ historical, start, end }) => {
     snap => {
       const val = snap.val() || {}
       if (needsFilter)
-        for (const uid in val)
+        for (const uid in val) {
           for (const id in val[uid])
             if (val[uid][id].date < start || val[uid][id].date > end)
               delete val[uid][id]
+          if (!Object.entries(val[uid]).length)
+            delete val[uid]
+        }
+      console.log(val)
       setOrders(val)
     }
   ), [])
@@ -162,12 +166,16 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
             <tr><td colSpan={100}>
               <Typography variant="h6" align="center">В закупке нет заказов</Typography>
             </td></tr>
-          ) : (!historical &&
+          ) : (
             <tr className="category no-center">
               <td colSpan={100}>
-                <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} >
-                  <Typography variant="h5">Закрыть закупку на {toCurrencyStringRu(total)}</Typography>
-                </button>
+                {historical ? (
+                  <Typography variant="h5" align="center"><b>Итого закупка на {toCurrencyStringRu(total)}</b></Typography>
+                ) : (
+                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} >
+                    <Typography variant="h5">Закрыть закупку на {toCurrencyStringRu(total)}</Typography>
+                  </button>
+                )}
               </td>
             </tr>
           )}
