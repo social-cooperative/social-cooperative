@@ -10,7 +10,7 @@ const getDetails = ({ total, timestamp, phone }: IPayDetails) => ({
     CorrespAcc: '30101810845250000999',
     PayeeINN: '9715431330',
     KPP: '771501001',
-    Purpose: `Внесение паевого взноса №${timestamp}-${phone} на целевую программу «Совместная закупка». Без НДС`,
+    Purpose: `Паевой взнос №${timestamp} #${phone}. Без НДС`,
     SumRub: total,
   })
   
