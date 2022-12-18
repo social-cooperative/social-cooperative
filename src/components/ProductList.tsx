@@ -183,6 +183,10 @@ const Product = props => {
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
   const { model, edit, admin } = props
 
+  const [isQRModalOpened, setIsQRModalOpened] = useState(false);
+  const openModal = () => { setIsQRModalOpened(true) };
+  const closeModal = () => { setIsQRModalOpened(false) };
+
   const deleteProduct = useCallback(() => {
     if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`)) {
       if (model.image) storage.ref(model.image).delete().catch(() => { })
@@ -214,12 +218,13 @@ const Product = props => {
             </div>
             {true && 
               <div>
-                <Button>
+                <Button onClick={openModal}>
                   Подробнее
                 </Button>
               </div>
             }
           </div>
+          <ProductDetailsModal isOpened={isQRModalOpened} onClose={closeModal} details={model} />
           <footer className='product-section product-section-grid'>
             <p className='product-price'>{model.price ? toCurrencyStringRu(model.price) : '-'}</p>
             <div className='product-counter'>
@@ -237,8 +242,16 @@ const Product = props => {
             <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
           </div>
           <div className='product-section'>
-            <p className='product-label'>комментарий / описание:</p>
+            <p className='product-label'>комментарий (будет снаружи карточки):</p>
             <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>описание (будет внутри модалки):</p>
+            <FirebaseEditorField path={`/products/${model.id}/description`} value={model.description} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>внутренний комментарий (будет внутри модалки):</p>
+            <FirebaseEditorField path={`/products/${model.id}/about`} value={model.about} enabled={edit} />
           </div>
           <div className='product-section'>
             <p className='product-label'>фасовка:</p>
@@ -270,6 +283,7 @@ import FirebaseImageUploader from './FirebaseImageUploader'
 import PageTitle from './PageTitle'
 import EditorField from './EditorField'
 import CurrentProcurement from './CurrentProcurement'
+import ProductDetailsModal from './ProductDetailsModal';
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
