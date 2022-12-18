@@ -16,6 +16,8 @@ export default function MainPage() {
     {}
   );
 
+  const procurementIsReady = now > startDate && now < endDate;
+
   if (now < startDate) {
     previewConfig.subtitle = 'Дата начала:';
     previewConfig.date = locilizeDate(startDate);
@@ -44,9 +46,9 @@ export default function MainPage() {
               {previewConfig.date && (
                 <h2 className='preview-subheading'>{previewConfig.date}</h2>
               )}
-              <a className='preview-button' href='/store'>
+              {procurementIsReady && <a className='preview-button' href='/store'>
                 Каталог
-              </a>
+              </a>}
             </div>
           </section>
           <main className='main-page-content'>
