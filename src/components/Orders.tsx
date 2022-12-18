@@ -53,12 +53,46 @@ export const Product = props => {
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
 export default () => {
+
+  const [history, setHistory] = useState({})
+  useEffect(() => subscribe(
+    database.ref('ordersHistory'),
+    'value',
+    snap => setHistory(snap.val() || {})
+  ), []);
+
+  useEffect(() => subscribe(
+    database.ref(`ordersHistory`),
+    'value',
+    snap => setHistory(snap.val() || {})
+  ), [])
+  const foo = Object.entries(history).reduce((acc, [userId, orders]) => {
+    const orderList = Object.entries(orders).reduce((orderAcc, [orderId, order]) => {
+      if (order.date > 1670911255000 && order.date < 1671033600000) {
+        orderAcc[orderId] = order;
+      }
+      return orderAcc;
+    }, {});
+    if (Object.keys(orderList).length >= 1) {
+      acc[userId] = orderList;
+    }
+    return acc;
+  }, {})
+  // console.log('proc', foo)
+  const bar = Object.values(foo).flatMap((e) => Object.values(e)).map((e) => {
+    e.products = productsTotal(e.products)
+    return e
+  });
+  console.log(JSON.stringify(bar));
+
+
   const [orders, setOrders] = useState({})
   useEffect(() => subscribe(
     database.ref(`orders/${auth.currentUser.uid}`),
     'value',
     snap => setOrders(snap.val() || {})
   ), [])
+
   const [ordersHistory, setOrdersHistory] = useState({})
   useEffect(() => subscribe(
     database.ref(`ordersHistory/${auth.currentUser.uid}`),
@@ -164,7 +198,7 @@ export const Orders = ({ orders = {}, ordersHistory = {}, ordersCanceled = {} })
         </tbody>
       </Table>
 
-      <PageTitle sx={{ marginTop: '1em' }}>Исполенные заказы</PageTitle>
+      <PageTitle sx={{ marginTop: '1em' }}>Исполненные заказы</PageTitle>
       <Table>
         <thead>
           <tr>

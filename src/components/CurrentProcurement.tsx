@@ -3,7 +3,7 @@ import { Typography } from '@mui/material'
 
 import DateTimePicker from './DateTimePicker'
 import { database } from '../firebase'
-import { toCurrencyStringRu, toLocaleStringRu, useFirebaseState } from '../utils'
+import { locilizeDate, toCurrencyStringRu, toLocaleStringRu, useFirebaseState } from '../utils'
 
 const resetAllCarts = () => {
   if (confirm(`Вы собираетесь очистить все корзины карзины всех пользователей, это действие невозможно отменить.\n\nВы уверены?`)) {
@@ -28,39 +28,47 @@ const CurrentProcurement = ({ edit = false }) => {
   const incorrect = startDate >= endDate
   if (!endDate) return null
   return (
-    <Typography variant="h6" style={{marginBottom: '1em'}}>
-      {edit ? (
-        <>
-          <table style={{borderSpacing: '0 12px'}}>
-            <tbody>
-              <tr><td>
-                <p>Минимальная сумма закупки:</p>
-                <input value={minCartTotal} onChange={setMinCartTotal} size={11} /> ₽
-              </td></tr>
-              <tr><td>    
-                <DateTimePicker value={startDate} onChange={setStartDate} label="Начало закупки" />
-              </td></tr>
-              <tr><td>    
-                <DateTimePicker value={endDate} onChange={setEndDate} label="Окончание закупки" />
-              </td></tr>
-            </tbody>
-          </table>
-          {incorrect && <b style={{ color: 'red' }}>Дата окончания закупки раньше даты начала!</b>}
-          <div><button onClick={resetAllCarts}>Очистить все корзины</button></div>
-        </>
-      ) : (
-        <span>
-          {activeNow ? (
-            `Закупка продлится до ${toLocaleStringRu(endDate)}`
-          ) : (upcoming ? (
-            `Следующая закупка начнётся ${toLocaleStringRu(startDate)}`
-          ) : (
-            `Последняя закупка была ${toLocaleStringRu(endDate)}`
-          ))}
-          , минимальная сумма закупки {toCurrencyStringRu(minCartTotal)}
-        </span>
-      )}
-    </Typography>
+    <>
+      <Typography variant="h6" style={{marginBottom: '1em'}}>
+        {edit ? (
+          <>
+            <table style={{borderSpacing: '0 12px'}}>
+              <tbody>
+                <tr><td>
+                  <p>Минимальная сумма закупки:</p>
+                  <input value={minCartTotal} onChange={setMinCartTotal} size={11} /> ₽
+                </td></tr>
+                <tr><td>    
+                  <DateTimePicker value={startDate} onChange={setStartDate} label="Начало закупки" />
+                </td></tr>
+                <tr><td>    
+                  <DateTimePicker value={endDate} onChange={setEndDate} label="Окончание закупки" />
+                </td></tr>
+              </tbody>
+            </table>
+            {incorrect && <b style={{ color: 'red' }}>Дата окончания закупки раньше даты начала!</b>}
+            <div><button onClick={resetAllCarts}>Очистить все корзины</button></div>
+          </>
+        ) : (
+          <span>
+            {activeNow ? (
+              `Закупка продлится до ${locilizeDate(endDate)}`
+            ) : (upcoming ? (
+              `Следующая закупка начнётся ${locilizeDate(startDate)}`
+            ) : (
+              `Последняя закупка была ${toLocaleStringRu(endDate)}`
+            ))}
+            . Минимальная сумма закупки {toCurrencyStringRu(minCartTotal)}
+          </span>
+        )}
+      </Typography>
+      {!activeNow && <Typography variant="h6" style={{marginBottom: '1em'}}>
+        Пожалуйста, обратите внимание, что к началу закупки цены в каталоге будут обновлены.
+      </Typography>}
+      {activeNow && <Typography variant="h6" style={{marginBottom: '1em'}}>
+        Заказанные товары будут доставлены вам в воскресенье.
+      </Typography>}
+    </>
   )
 }
 

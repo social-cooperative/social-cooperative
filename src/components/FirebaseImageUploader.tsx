@@ -52,7 +52,7 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
       alert('Максимальный размер файла - 10 мегабайт')
       inputRef.current.value = ''
     } else {
-      resizeImage(file, 300, file => 
+      resizeImage(file, 600, file => 
         storage
           .ref(newPath)
           .put(file)

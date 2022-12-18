@@ -2,7 +2,13 @@ import styled from 'styled-components'
 
 import { auth, database, storage } from '../firebase'
 import { CellImg } from './Table'
-import { toCurrencyStringRu, useFirebaseState, useFirebaseValue } from '../utils'
+import { toCurrencyStringRu, useFirebaseValue } from '../utils'
+
+import Accordion from '@mui/material/Accordion';
+import Button from '@mui/material/Button';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Root = styled.div`
   padding: 1em;
@@ -18,7 +24,6 @@ const Root = styled.div`
 
   .category {
     text-align: center;
-    background-color: #239F2328;
     color: #239F23;
     padding: 12px 0;
     font-size: 32px;
@@ -207,10 +212,11 @@ const Product = props => {
               <p className='product-label'>фасовка:</p>
               <p>{model.unit || '-'}</p>
             </div>
-            {model.link && 
+            {true && 
               <div>
-                <p className='product-label'>ссылка на отзыв:</p>
-                <a href={model.link}>Подробнее</a>
+                <Button>
+                  Подробнее
+                </Button>
               </div>
             }
           </div>
@@ -334,10 +340,14 @@ export default () => {
       <section>
         {Object.entries<any>(products).map(([category, products]) =>
           <React.Fragment key={category}>
-            <div className="category">
-              <CategoryEditorField category={category} products={products} enabled={edit} />
-              {edit && <button style={{ float: 'right' }} onClick={addProduct(category)}>➕</button>}
-            </div>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <div className="category">
+                  <CategoryEditorField category={category} products={products} enabled={edit} />
+                  {edit && <button style={{ float: 'right' }} onClick={addProduct(category)}>➕</button>}
+                </div>
+            </AccordionSummary>
+            <AccordionDetails>
             <div className='product-list'>
               {products.map((p, i) => <Product
                 key={p.id}
@@ -346,6 +356,8 @@ export default () => {
                 edit={edit}
               />)}
             </div>
+            </AccordionDetails>
+            </Accordion>
           </React.Fragment>
         )}
       </section>

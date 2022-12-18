@@ -1,14 +1,8 @@
 import { CircularProgress } from '@mui/material';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ru';
 
-import { useFirebaseState } from '../../utils';
+import { locilizeDate, useFirebaseState } from '../../utils';
 import Root from './MainPage.style';
 
-dayjs.extend(localizedFormat)
-
-const locilizeDate = (date: number | string | Date) => dayjs(date).locale('ru').format('DD MMMM, dddd, HH:mm');
 const now = Date.now();
 const previewConfig = {
   title: 'Новая совместная закупка уже скоро!',
@@ -53,7 +47,7 @@ export default function MainPage() {
                   {previewConfig.date}
                 </h2>
               }
-              <a className='preview-button' href='/store'>Посмотреть склад</a>
+              <a className='preview-button' href='/store'>Каталог</a>
             </div>
           </section>
           <main className='main-page-content'>
@@ -154,7 +148,7 @@ export default function MainPage() {
                   расскажите о нас вашим друзьям и близким!
                 </p>
                 <p>
-                  Наш сайт <a href='#'>СОЦКООП.РФ</a>
+                  Наш сайт <a href='/store' target='_blank'>СОЦКООП.РФ</a>
                 </p>
               </article>
               <aside className='page-section-aside'>
@@ -165,7 +159,7 @@ export default function MainPage() {
                     alt='Информационный телеграм-канал СоцКооп'
                   />
                   <p className='qr-item-label'>
-                    Информационный телеграм-канал.
+                    Информационный телеграм-канал.&nbsp;
                     <a href='https://t.me/+8DFjKvDrZR41ZGIy' target='_blank'>
                       Прямая ссылка
                     </a>

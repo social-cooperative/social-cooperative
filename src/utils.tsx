@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 
 const cx_flatten = (from, to = []) => {
   if (typeof from === 'string' || from instanceof String)
@@ -623,3 +626,7 @@ export const resizeImage = (file, max_size, cb) => {
     reader.readAsDataURL(file)
   }
 }
+
+dayjs.extend(localizedFormat)
+
+export const locilizeDate = (date: number | string | Date) => dayjs(date).locale('ru').format('DD MMMM, dddd, HH:mm');

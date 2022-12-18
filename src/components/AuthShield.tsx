@@ -1,7 +1,7 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { useEffect, useState, useCallback } from 'react'
 import styled from 'styled-components'
-import { memo, useRef } from 'react'
+import { memo } from 'react'
 
 import { auth, firebase, logout } from '../firebase'
 import { timeout, useDispatch } from '../utils'

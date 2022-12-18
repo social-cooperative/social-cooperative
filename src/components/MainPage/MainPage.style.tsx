@@ -109,13 +109,13 @@ export default styled.div`
     border: 0;
     border-radius: 4px;
     color: #239f23;
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 22px;
     line-height: 17px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 12px 14px;
+    padding: 20px;
     font-family: 'Inter', sans-serif;
     text-transform: uppercase;
     cursor: pointer;

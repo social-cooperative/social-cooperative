@@ -57,7 +57,7 @@ export default function QRModal({ isOpened, id, onClose, first = false, details 
         </DialogTitle>
         <DialogContent id="alert-dialog-description">
             <Root>
-                Используйте для оплаты своё банковское приложение.
+                Используйте для оплаты своё банковское приложение на смартфоне. Банк может взимать комиссию за перевод.
                 <div className='image-wrapper'>
                     <img src={createQRLink(details)} />
                 </div>
