@@ -216,7 +216,7 @@ const Product = props => {
               <p className='product-label'>фасовка:</p>
               <p>{model.unit || '-'}</p>
             </div>
-            {true && 
+            {(model.description || model.about) && 
               <div>
                 <Button onClick={openModal}>
                   Подробнее
