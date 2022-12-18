@@ -172,7 +172,7 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
                 {historical ? (
                   <Typography variant="h5" align="center"><b>Итого закупка на {toCurrencyStringRu(total)}</b></Typography>
                 ) : (
-                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} >
+                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} disabled>
                     <Typography variant="h5">Закрыть закупку на {toCurrencyStringRu(total)}</Typography>
                   </button>
                 )}
