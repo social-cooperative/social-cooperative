@@ -13,6 +13,14 @@ const Root = styled.div`
   padding: 1em;
 `
 
+const generateListFromOrders = (orders) => {
+  return Object.entries(orders).flatMap(([userId, ordersByKey]) => {
+    return Object.entries(ordersByKey).map(([orderId, order]) => ({
+      ...order, orderId, userId
+    }));
+  })
+}
+
 const adminSelector = store => !!store.claims.admin
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
@@ -33,7 +41,6 @@ const useProcurement = ({ historical, start, end }) => {
           if (!Object.entries(val[uid]).length)
             delete val[uid]
         }
-      console.log(val)
       setOrders(val)
     }
   ), [])
@@ -145,21 +152,8 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
         <tbody>
           {byProducts
             ? <ByProducts orders={orders} />
-            : Object.entries<any>(orders).sort(sortByDate).map(([id, orders]) =>
-              <React.Fragment key={id}>
-                <tr className="category">
-                  <td colSpan={100} style={{ background: '#bae5c6' }}>
-                    <Typography variant="h5">
-                      Пользователь <b>{Object.values<any>(orders)[0]?.phone}</b>,
-                      заказов: {Object.values(orders).length},
-                      на сумму: <b>{toCurrencyStringRu(Object.values<any>(orders).reduce((acc, order) => acc += productsTotal(order.products), 0))}</b>
-                    </Typography>
-                  </td>
-                </tr>
-                {Object.entries<any>(orders).sort(sortByDate).map(([id, order]) =>
-                  <Order key={id} id={id} order={order} cancellable />
-                )}
-              </React.Fragment>
+            : generateListFromOrders(orders).sort((a, b) => b.date - a.date).map(
+              (order, index) => <Order key={index} id={order.id} order={order} cancellable withPhone />
             )
           }
           {!Object.entries<any>(orders).length ? (

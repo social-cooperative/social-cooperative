@@ -100,7 +100,7 @@ const Product = props => {
         <td></td>
         <td colSpan={6}>Этого продукта больше нет, вы можете удалить или заменить его перед заказом</td>
       </tr>
-      {Object.entries<any>(alternatives).map(([key, product]) =>
+      {alternatives && Object.entries<any>((alternatives)).map(([key, product]) =>
         <tr className="product" key={key} style={{ background: props.darker ? '#E7F7EB' : undefined }}>
           <td></td>
           <td>{product.name}</td>

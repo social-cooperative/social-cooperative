@@ -108,7 +108,7 @@ export default () => {
   return <Orders orders={orders} ordersHistory={ordersHistory} ordersCanceled={ordersCanceled} />
 }
 
-export const Order = ({ order, id, cancellable = false, deletable = false, actual = false }) => {
+export const Order = ({ order, id, cancellable = false, deletable = false, actual = false, withPhone = false }) => {
   const { products, date } = order
   const total = productsTotal(products)
   const orderedAt = toLocaleStringRu(date)
@@ -140,15 +140,14 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
     total
   }
 
-
   return <>
     {actual && <QRModal isOpened={isQRModalOpened} id={placedOrderId} onClose={closeModal} details={details}/>}
     <tr className="category">
       <td colSpan={100}>
-        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder} disabled>🗑️</button>}
+        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
         {deletable && <button style={{ float: 'right' }} onClick={deleteOrder} >🗑️</button>}
         <Typography variant="h6">
-          Заказ от <b>{orderedAt}</b> на сумму <b>{toCurrencyStringRu(total)}</b>
+          Заказ от <b>{orderedAt}</b> <b>{withPhone ? order.phone : ''}</b> на сумму <b>{toCurrencyStringRu(total)}</b>
         </Typography>
         {!!order.name && <Typography align="left">
           {order.name}

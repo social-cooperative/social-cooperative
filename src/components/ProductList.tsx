@@ -298,7 +298,10 @@ export const categorize = products => {
   const categories = products.reduce((acc, v) => ((acc[v.category] ? acc[v.category].push(v) : (acc[v.category] = [v])), acc), {}) as any
   for (const k in categories)
     categories[k] = categories[k].sort((a, b) => a.name > b.name ? 1 : -1)
-  return Object.fromEntries(Object.entries(categories).sort((a, b) => a[0] > b[0] ? 1 : -1)) as any
+  return Object.fromEntries(Object.entries(categories).sort((a, b) => {
+    if (a[0] === 'Новогодний подарок') return -1;
+    return a[0] > b[0] ? 1 : -1;
+  })) as any
 }
 
 const addProduct = (category?) => () => {
