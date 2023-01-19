@@ -6,6 +6,7 @@ import { toCurrencyStringRu, useFirebaseValue } from '../utils'
 
 import Accordion from '@mui/material/Accordion';
 import Button from '@mui/material/Button';
+import InfoIcon from '@mui/icons-material/Info';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -142,6 +143,13 @@ const Root = styled.div`
     color: #239F23;
   }
 
+  .product-unit-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: #aaa;
+    margin-top: 4px;
+  }
+
   .product-buy {
     background-color: #239F23;
     border: 0;
@@ -194,6 +202,8 @@ const Product = props => {
     }
   }, [model])
 
+  const unitName = model.isForCooperate ? 'шт.' : model.unitName;
+
   const addToBasket = useCallback(() => addToCart(count, model), [count, model])
 
   const canBuy = !!model.price  
@@ -214,7 +224,7 @@ const Product = props => {
           <div className='product-section product-section-grid'>
             <div>
               <p className='product-label'>фасовка:</p>
-              <p>{model.unit || '-'}</p>
+              <p>{model.unit || '-'} {unitName}</p>
             </div>
             {(model.description || model.about) && 
               <div>
@@ -225,8 +235,19 @@ const Product = props => {
             }
           </div>
           <ProductDetailsModal isOpened={isQRModalOpened} onClose={closeModal} details={model} />
+          {model.isForCooperate && 
+            <Button onClick={openModal} endIcon={<InfoIcon />}>
+              Товар для кооперации
+            </Button>
+          }
           <footer className='product-section product-section-grid'>
-            <p className='product-price'>{model.price ? toCurrencyStringRu(model.price) : '-'}</p>
+            <div>
+              <p className='product-price'>{model.price ? toCurrencyStringRu(model.price) : '-'}</p>
+              <p className='product-unit-price'>
+                {(model.unitPrice && `${model.unitPrice} ₽ за 1 ${unitName}`)}
+                &nbsp;
+              </p>
+            </div>
             <div className='product-counter'>
               <button disabled={!canBuy} onClick={decCount}>-</button>
               <input disabled={!canBuy} size={11} style={{ display: 'block', textAlign: 'center' }} value={canBuy ? count : 'Нет в наличии'} readOnly />
@@ -253,9 +274,18 @@ const Product = props => {
             <p className='product-label'>внутренний комментарий (будет внутри модалки):</p>
             <FirebaseEditorField path={`/products/${model.id}/about`} value={model.about} enabled={edit} />
           </div>
+          
           <div className='product-section'>
-            <p className='product-label'>фасовка:</p>
+            <p className='product-label'>товар для кооперации:</p>
+            <FirebaseEditorCheckbox path={`/products/${model.id}/isForCooperate`} value={model.isForCooperate} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>фасовка (число):</p>
             <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>ед. измерения фасовки (кг. / шт. / л.):</p>
+            <FirebaseEditorField path={`/products/${model.id}/unitName`} value={model.unitName} enabled={edit} />
           </div>
           <div className='product-section'>
             <p className='product-label'>ссылка на отзыв:</p>
@@ -266,6 +296,10 @@ const Product = props => {
           <div className='product-section'>
             <p className='product-label'>цена:</p>
             <FirebaseEditorField path={`/products/${model.id}/price`} value={model.price} enabled={edit} number />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>цена за 1 ед. измерения фасовки:</p>
+            <FirebaseEditorField path={`/products/${model.id}/unitPrice`} value={model.unitPrice} enabled={edit} number />
           </div>
         </React.Fragment>
       }
@@ -279,11 +313,13 @@ const Product = props => {
 import { hash, log, subscribe, useCounter, useSelector, useToggle } from '../utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import FirebaseEditorField from './FirebaseEditorField'
+import FirebaseEditorCheckbox from './FirebaseEditorCheckbox'
 import FirebaseImageUploader from './FirebaseImageUploader'
 import PageTitle from './PageTitle'
 import EditorField from './EditorField'
 import CurrentProcurement from './CurrentProcurement'
 import ProductDetailsModal from './ProductDetailsModal';
+import { Badge } from '@mui/material';
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
