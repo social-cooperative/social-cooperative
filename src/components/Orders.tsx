@@ -147,8 +147,8 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
     {actual && <QRModal isOpened={isQRModalOpened} id={placedOrderId} onClose={closeModal} details={details}/>}
     <tr className="category">
       <td colSpan={100}>
-        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
-        {deletable && <button style={{ float: 'right' }} onClick={deleteOrder} >🗑️</button>}
+        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder} disabled>🗑️</button>}
+        {deletable && <button style={{ float: 'right' }} onClick={deleteOrder} disabled>🗑️</button>}
         <Typography variant="h6">
           Заказ от <b>{orderedAt}</b> <b>{withPhone ? order.phone : ''}</b> на сумму <b>{toCurrencyStringRu(total)}</b>
         </Typography>

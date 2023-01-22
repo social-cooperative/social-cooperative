@@ -36,8 +36,7 @@ const Product = props => {
   useEffect(() => {
     return subscribe(database.ref(`/products/${model.product.id}`), 'value', snap => {
       const product = snap.val()
-      log(product)
-      if (!product) {
+        if (!product) {
         setFrozen(true)
         props?.onFrozen(model.product.name, true)
         return
@@ -171,7 +170,7 @@ export const Cart = ({ products = {} }) => {
 
   const checkOrderCreationDisability = (): boolean => {
     // Базовая валидация
-    if (!(name && address && cartTotalValid && !frozenProductsList.length)) {
+    if (!(name && address && cartTotalValid && activeNow && !frozenProductsList.length)) {
       return true;
     }
 

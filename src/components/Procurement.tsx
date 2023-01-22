@@ -8,6 +8,7 @@ import { Table } from './Table'
 import { Order } from './Orders'
 import PageTitle from './PageTitle'
 import { categorize } from './ProductList'
+import { Button } from '@mui/material'
 
 const Root = styled.div`
   padding: 1em;
@@ -133,6 +134,7 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
         })))
     }))
   }, [orders])
+
   return (
     <Root>
       <PageTitle>
