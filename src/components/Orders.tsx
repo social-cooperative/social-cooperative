@@ -140,8 +140,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
     phone: order.phone,
     total
   }
-
-  const optionForNotCalled = order.isRemoveIfNotCalled === 'true' && !!order.isRemoveIfNotCalled ? 'удалить' : 'заменить';
+  const optionForNotCalled = order.isRemoveIfNotCalled ? 'удалить' : 'заменить';
 
   return <>
     {actual && <QRModal isOpened={isQRModalOpened} id={placedOrderId} onClose={closeModal} details={details}/>}

@@ -34,6 +34,12 @@ const List = styled.ol`
     li {
         margin-bottom: 8px;
     }
+    ol {
+        padding-left: 24px;
+        margin-top: 18px;
+        margin-bottom: 22px;
+        list-style: lower-alpha;
+    }
 `
 
 export default function ProductDetailsModal({ isOpened, onClose }: IAlertDialog) {
