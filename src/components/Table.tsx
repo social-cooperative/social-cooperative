@@ -16,7 +16,13 @@ export const Table = styled.table`
   & .category td {
     padding: 1em;
     background: #239F2328;
-    text-align: center;
+  }
+  
+  & .category-heading {
+    text-align: left;
+    font-weight: 600;
+    font-size: 20px;
+    color: #239F23;
   }
   
   & .category.no-center td {

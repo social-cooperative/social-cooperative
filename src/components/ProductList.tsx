@@ -144,7 +144,7 @@ const Root = styled.div`
   }
 
   .product-unit-price {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #aaa;
     margin-top: 4px;

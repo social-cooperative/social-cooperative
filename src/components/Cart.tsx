@@ -7,6 +7,9 @@ import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { addToCart, productSlug } from './ProductList'
 import { log, productsTotal, toCurrencyStringRu, toLocaleStringRu, useFirebaseValue, useInputState } from '../utils'
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 const Root = styled.div`
   padding: 1em;
@@ -60,6 +63,8 @@ const Product = props => {
     count: Math.max(model.count - 1, 1),
   }), [model])
 
+  const unitName = model.product.isForCooperate ? 'шт.' : model.product.unitName;
+
   return <>
     <tr id={model.product.name} className="product" style={{
       background: props.darker ? '#E7F7EB' : undefined,
@@ -68,14 +73,18 @@ const Product = props => {
       <td className="image">
         <FirebaseImageUploader src={model.product.image} enabled={false} component={CellImg} />
       </td><td>
-        <Typography variant="h6" title={model.product.comment}>
-          {model.product.name}{frozen && ' *'}
+        <Typography title={model.product.comment}>
+          <b>{model.product.name}{frozen && ' *'}</b>
         </Typography>
-      </td><td>
-        <Typography>
-          {model.product.unit}
-        </Typography>
-      </td><td>
+      </td>
+      <td style={{textAlign: 'center', width: '100px'}} >
+        <FirebaseEditorCheckbox path={`/carts/${auth.currentUser.uid}/${model.id}/forChange`} value={model.forChange} enabled={true} />
+      </td>
+      {props.allowCooperate && <td style={{textAlign: 'center', width: '100px'}} >
+        {model.product.isForCooperate && 
+        <FirebaseEditorCheckbox path={`/carts/${auth.currentUser.uid}/${model.id}/forCooperate`} value={model.forCooperate} enabled={true} />}
+      </td>}
+      <td>
         <Typography>
           {model.product.price ? toCurrencyStringRu(model.product.price) : '-'}
         </Typography>
@@ -87,12 +96,17 @@ const Product = props => {
         <Typography>
           {toCurrencyStringRu(total)}
         </Typography>
-      </td><td>
-        <Typography component="div" style={{ display: 'flex', float: 'right' }}>
-          <button style={{ width: 25 }} onClick={incCount} disabled={frozen}>+</button>
-          <button style={{ width: 25 }} onClick={decCount} disabled={frozen || model.count <= 1}>-</button>
-          <button onClick={deleteFromCart}>Удалить</button>
-        </Typography>
+      </td>
+      <td style={{ display: 'flex' }}>
+        <IconButton color='primary' onClick={incCount} disabled={frozen}>
+          <AddIcon />
+        </IconButton>
+        <IconButton  color='warning' onClick={decCount} disabled={frozen || model.count <= 1}>
+        <RemoveIcon />
+        </IconButton>
+        <IconButton  color='error' onClick={deleteFromCart}>
+        <DeleteIcon />
+        </IconButton>
       </td>
     </tr>
     {frozen && <>
@@ -122,6 +136,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import FirebaseImageUploader from './FirebaseImageUploader'
 import PageTitle from './PageTitle'
 import CurrentProcurement from './CurrentProcurement'
+import { IconButton } from '@mui/material'
+import FirebaseEditorCheckbox from './FirebaseEditorCheckbox'
 
 const categorize = products => products.reduce((acc, v) => ((acc[v.product.category] ? acc[v.product.category].push(v) : (acc[v.product.category] = [v])), acc), {}) as any
 
@@ -142,6 +158,7 @@ export const Cart = ({ products = {} }) => {
   const [name, setName, setNameRaw] = useInputState()
   const [address, setAddress, setAddressRaw] = useInputState()
   const [comment, setComment] = useInputState()
+  const [cooperateDetails, setCooperateDetails] = useInputState()
 
   const [payDetails, setPayDetails] = useState({ phone: '', timestamp: '', total: '' })
   const [isQRModalOpened, setIsQRModalOpened] = useState(false)
@@ -207,6 +224,8 @@ export const Cart = ({ products = {} }) => {
     })
   }, [products, name, address, comment])
 
+  const allowCooperate =  Object.values(products).some((model: any) => model.product.isForCooperate);
+
   return (
     <Root>
       <PageTitle>Корзина</PageTitle>
@@ -214,24 +233,36 @@ export const Cart = ({ products = {} }) => {
       <Table>
         <thead>
           <tr>
-            <td><Typography>Фото</Typography></td>
-            <td><Typography>Наименование</Typography></td>
-            <td><Typography>Ед. изм.</Typography></td>
-            <td><Typography>Цена</Typography></td>
-            <td><Typography>Кол-во</Typography></td>
-            <td><Typography>Стоимость</Typography></td>
-            <td><Typography>Действия</Typography></td>
+            <td><Typography></Typography></td>
+            <td><Typography></Typography></td>
+            <td>
+              <Typography style={{textAlign: 'center', fontSize: '14px'}}>
+                Согласовывать замену товара
+              </Typography>
+            </td>
+            {
+            allowCooperate && 
+            <td>
+              <Typography style={{textAlign: 'center', fontSize: '14px'}}>
+                Кооперация
+              </Typography>
+            </td>
+            }
+            <td><Typography></Typography></td>
+            <td><Typography></Typography></td>
+            <td><Typography></Typography></td>
+            <td><Typography></Typography></td>
           </tr>
         </thead>
         <tbody>
           {Object.entries<any>(categories).map(([category, products]) =>
             <React.Fragment key={category}>
-              <tr className="category"><td colSpan={100}>
-                <Typography variant="h5">
-                  {category}
-                </Typography>
+              <tr className="category">
+                <td colSpan={100}>
+                <Typography className='category-heading'> {category} </Typography>
               </td></tr>
               {products.map((p, i) => <Product
+                allowCooperate
                 key={p.id}
                 onFrozen={onFrozen}
                 model={p}
@@ -255,6 +286,9 @@ export const Cart = ({ products = {} }) => {
                     </div>
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
                       <input placeholder="Комментарий" value={comment} onChange={setComment} style={{ flex: 1 }} />
+                    </div>
+                    <div style={{ display: 'flex', marginBottom: '0.5em' }}>
+                      <textarea placeholder="С кем и как кооперироваться" value={cooperateDetails} onChange={setCooperateDetails} style={{ flex: 1, width: '896px' }} />
                     </div>
                     <CurrentProcurement />
                     {activeNow && !!frozenProductsList.length &&
