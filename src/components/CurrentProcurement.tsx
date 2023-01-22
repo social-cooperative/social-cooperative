@@ -56,9 +56,9 @@ const CurrentProcurement = ({ edit = false }) => {
             ) : (upcoming ? (
               `Следующая закупка начнётся ${locilizeDate(startDate)}`
             ) : (
-              `Последняя закупка была ${toLocaleStringRu(endDate)}`
+              `Последняя закупка продлилась до ${toLocaleStringRu(endDate)}`
             ))}
-            . Минимальная сумма закупки {toCurrencyStringRu(minCartTotal)}
+            . <br/> Минимальная сумма закупки {toCurrencyStringRu(minCartTotal)}
           </span>
         )}
       </Typography>

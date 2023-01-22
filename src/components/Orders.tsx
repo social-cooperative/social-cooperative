@@ -2,6 +2,8 @@ import Typography from '@mui/material/Typography'
 import styled from 'styled-components'
 import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import PeopleIcon from '@mui/icons-material/People';
 
 import QRModal from './QRModal';
 import { productsTotal, subscribe, toCurrencyStringRu, toLocaleStringRu } from '../utils'
@@ -27,7 +29,12 @@ export const Product = props => {
     <tr className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
       <td>
         <Typography title={model.product.comment}>
-          {model.product.name} {!!model.product.category && <small>({model.product.category})</small>}
+          {model.product.name} 
+          {!!model.product.category && <small>({model.product.category})</small>}
+          &nbsp;
+          {!!model.forChange && <ChangeCircleIcon color="success" style={{verticalAlign: 'middle'}}/>}
+          &nbsp;
+          {!!model.forCooperate && <PeopleIcon color="primary" style={{verticalAlign: 'middle'}}/>}
         </Typography>
       </td><td>
         <Typography>
@@ -78,12 +85,6 @@ export default () => {
     }
     return acc;
   }, {})
-  // console.log('proc', foo)
-  const bar = Object.values(foo).flatMap((e) => Object.values(e)).map((e) => {
-    e.products = productsTotal(e.products)
-    return e
-  });
-  console.log(JSON.stringify(bar));
 
 
   const [orders, setOrders] = useState({})
@@ -140,11 +141,13 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
     total
   }
 
+  const optionForNotCalled = order.isRemoveIfNotCalled === 'true' && !!order.isRemoveIfNotCalled ? 'удалить' : 'заменить';
+
   return <>
     {actual && <QRModal isOpened={isQRModalOpened} id={placedOrderId} onClose={closeModal} details={details}/>}
     <tr className="category">
       <td colSpan={100}>
-        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder} disabled>🗑️</button>}
+        {cancellable && <button style={{ float: 'right' }} onClick={cancelOrder}>🗑️</button>}
         {deletable && <button style={{ float: 'right' }} onClick={deleteOrder} >🗑️</button>}
         <Typography variant="h6">
           Заказ от <b>{orderedAt}</b> <b>{withPhone ? order.phone : ''}</b> на сумму <b>{toCurrencyStringRu(total)}</b>
@@ -158,6 +161,17 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
         {!!order.comment && <Typography align="left">
           {order.comment}
         </Typography>}
+        {!!order.wantToChange && 
+          <Typography align="left">
+            Есть товары для замены, в случае недозвона {optionForNotCalled} товары
+          </Typography>
+        }
+        {!!order.wantToCooperate && 
+        <Typography align="left">
+          <b>Детали кооперации:</b><br/>
+          {order.cooperateDetails}
+        </Typography>
+        }
         {actual && <div className='pay-wrapper'><Button variant="outlined" onClick={openModal}>Оплатить</Button></div>}
       </td>
     </tr>

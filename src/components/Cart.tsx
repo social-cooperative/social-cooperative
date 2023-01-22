@@ -72,7 +72,8 @@ const Product = props => {
     }}>
       <td className="image">
         <FirebaseImageUploader src={model.product.image} enabled={false} component={CellImg} />
-      </td><td>
+      </td>
+      <td>
         <Typography title={model.product.comment}>
           <b>{model.product.name}{frozen && ' *'}</b>
         </Typography>
@@ -84,15 +85,17 @@ const Product = props => {
         {model.product.isForCooperate && 
         <FirebaseEditorCheckbox path={`/carts/${auth.currentUser.uid}/${model.id}/forCooperate`} value={model.forCooperate} enabled={true} />}
       </td>}
-      <td>
+      <td style={{width: '70px'}}>
         <Typography>
           {model.product.price ? toCurrencyStringRu(model.product.price) : '-'}
         </Typography>
-      </td><td>
+      </td>
+      <td style={{width: '60px'}}>
         <Typography>
           x{model.count}
         </Typography>
-      </td><td>
+      </td>
+      <td style={{width: '80px'}}>
         <Typography>
           {toCurrencyStringRu(total)}
         </Typography>
@@ -136,7 +139,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import FirebaseImageUploader from './FirebaseImageUploader'
 import PageTitle from './PageTitle'
 import CurrentProcurement from './CurrentProcurement'
-import { IconButton } from '@mui/material'
+import { FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
 import FirebaseEditorCheckbox from './FirebaseEditorCheckbox'
 
 const categorize = products => products.reduce((acc, v) => ((acc[v.product.category] ? acc[v.product.category].push(v) : (acc[v.product.category] = [v])), acc), {}) as any
@@ -158,7 +161,37 @@ export const Cart = ({ products = {} }) => {
   const [name, setName, setNameRaw] = useInputState()
   const [address, setAddress, setAddressRaw] = useInputState()
   const [comment, setComment] = useInputState()
-  const [cooperateDetails, setCooperateDetails] = useInputState()
+
+  const [cooperateDetails, setCooperateDetails, setCooperateDetailsRaw] = useInputState();
+  const [isRemoveIfNotCalled, setIsRemoveIfNotCalled] = useState(null);
+
+  const allowCooperate = Object.values(products).some((model: any) => model.product.isForCooperate);
+  const wantToCooperate = Object.values(products).some((model: any) => model.forCooperate);
+  const wantToChange = Object.values(products).some((model: any) => model.forChange);
+
+  const checkOrderCreationDisability = (): boolean => {
+    // Базовая валидация
+    if (!(name && address && cartTotalValid && !frozenProductsList.length)) {
+      return true;
+    }
+
+    // Если человек хочет кооперироваться, но не оставил инфу с кем
+    if (wantToCooperate && cooperateDetails?.length < 4) {
+      return true;
+    }
+
+    // Если человек хочет заменить товар, если что, но не оставил инфу
+    // на случай, если мы ему не дозвонимся
+    if (wantToChange && isRemoveIfNotCalled === null) {
+      return true;
+    }
+  }
+
+  const handleChangeRemoveIfNotCalledOption = ({ target }) => {
+    const value = target.value === 'false' ? false : true;
+    setIsRemoveIfNotCalled(value);
+    changeOptionInDB(value);
+  }
 
   const [payDetails, setPayDetails] = useState({ phone: '', timestamp: '', total: '' })
   const [isQRModalOpened, setIsQRModalOpened] = useState(false)
@@ -176,6 +209,8 @@ export const Cart = ({ products = {} }) => {
     const user = snap.val()
     setNameRaw(user?.name || '')
     setAddressRaw(user?.address || '')
+    setCooperateDetailsRaw(user?.cooperateDetails || '')
+    setIsRemoveIfNotCalled(user?.isRemoveIfNotCalled ?? null)
   }), [])
 
   useEffect(() => {
@@ -195,12 +230,21 @@ export const Cart = ({ products = {} }) => {
   const now = Date.now()
   const activeNow = now > startDate && now < endDate
 
-  const changeNameAndAddressInDB = useCallback(() => {
+
+  const changeOrderDetailsInDB = useCallback(() => {
     database.ref(`users/${auth.currentUser.uid}`).update({
       name,
       address,
+      isRemoveIfNotCalled, 
+      cooperateDetails,
     })
-  }, [name, address])
+  }, [name, address, isRemoveIfNotCalled, cooperateDetails])
+
+  const changeOptionInDB = useCallback((isRemoveIfNotCalled) => {
+    database.ref(`users/${auth.currentUser.uid}`).update({
+      isRemoveIfNotCalled, 
+    })
+  }, [isRemoveIfNotCalled])
 
   const placeOrder = useCallback(() => {
     const phone = auth.currentUser.phoneNumber
@@ -210,6 +254,10 @@ export const Cart = ({ products = {} }) => {
       uid: auth.currentUser.uid,
       phone,
       name,
+      wantToCooperate,
+      wantToChange,
+      cooperateDetails,
+      isRemoveIfNotCalled,
       address,
       comment,
     }).then(snap =>
@@ -223,8 +271,6 @@ export const Cart = ({ products = {} }) => {
       openModal()
     })
   }, [products, name, address, comment])
-
-  const allowCooperate =  Object.values(products).some((model: any) => model.product.isForCooperate);
 
   return (
     <Root>
@@ -281,15 +327,34 @@ export const Cart = ({ products = {} }) => {
                 <td colSpan={100}>
                   <Typography variant="h5" component="div">
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
-                      <input placeholder="Ф.И.О." value={name} onChange={setName} style={{ flex: 1, marginRight: '0.5em' }} onBlur={changeNameAndAddressInDB} />
-                      <input placeholder="Адрес" value={address} onChange={setAddress} style={{ flex: 1 }} onBlur={changeNameAndAddressInDB} />
+                      <input placeholder="Ф.И.О." value={name} onChange={setName} style={{ flex: 1, marginRight: '0.5em' }} onBlur={changeOrderDetailsInDB} />
+                      <input placeholder="Адрес" value={address} onChange={setAddress} style={{ flex: 1 }} onBlur={changeOrderDetailsInDB} />
                     </div>
                     <div style={{ display: 'flex', marginBottom: '0.5em' }}>
                       <input placeholder="Комментарий" value={comment} onChange={setComment} style={{ flex: 1 }} />
                     </div>
-                    <div style={{ display: 'flex', marginBottom: '0.5em' }}>
-                      <textarea placeholder="С кем и как кооперироваться" value={cooperateDetails} onChange={setCooperateDetails} style={{ flex: 1, width: '896px' }} />
-                    </div>
+                    {wantToCooperate && <div style={{ display: 'flex', marginBottom: '24px' }}>
+                      <textarea 
+                        placeholder="С кем и как кооперироваться" 
+                        value={cooperateDetails} 
+                        onChange={setCooperateDetails} 
+                        onBlur={changeOrderDetailsInDB}
+                        style={{ flex: 1, width: '100%', resize: 'none', height: '200px' }} 
+                      />
+                    </div>}
+                    {wantToChange && <div style={{ marginBottom: '24px' }}>
+                      <Typography variant="h6" style={{ marginBottom: '12px' }}>
+                        Как поступить, если мы не дозвонились вам для замены товара?
+                      </Typography>
+                      <RadioGroup 
+                        name="radio-buttons-group"
+                        value={isRemoveIfNotCalled}
+                        onChange={handleChangeRemoveIfNotCalledOption}
+                      >
+                        <FormControlLabel value={true} control={<Radio />} label="Убрать товар из корзины" />
+                        <FormControlLabel value={false} control={<Radio />} label="Произвести замену" />
+                      </RadioGroup>
+                    </div>}
                     <CurrentProcurement />
                     {activeNow && !!frozenProductsList.length &&
                       <Typography style={{ marginBottom: '1em' }} align="center">
@@ -297,7 +362,11 @@ export const Cart = ({ products = {} }) => {
                         {frozenProductsList.map(name => <div key={name}><a href={'#' + name}>{name}</a></div>)}
                       </Typography>
                     }
-                    <button disabled={!(name && address && cartTotalValid && activeNow && !frozenProductsList.length)} onClick={placeOrder} style={{ padding: '1em', display: 'block', width: '100%' }} >
+                    <button 
+                      disabled={checkOrderCreationDisability()} 
+                      onClick={placeOrder} 
+                      style={{ padding: '1em', display: 'block', width: '100%' }} 
+                    >
                       Внести пай на сумму {toCurrencyStringRu(total)}
                     </button>
                     <Typography style={{ marginTop: '1em' }}>
