@@ -28,7 +28,7 @@ export default function UnderConstruction() {
       <ShiedInner>
         <ShiedLogo src="under-construction.jpg" />
         <div>
-          <Typography variant="h4" style={{ fontFamily: '"Journal Sans New", Roboto', marginBottom: '0.6rem' }}>
+          <Typography style={{ fontFamily: '"Journal Sans New", Roboto', marginBottom: '0.6rem' }}>
             <img style={{ height: '0.8em', marginRight: '0.3em' }} src="logo.png" />
             СоцКооп
           </Typography>

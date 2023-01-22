@@ -189,11 +189,11 @@ export const addToCart = (count, model) => {
 
 const Product = props => {
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
-  const { model, edit, admin } = props
+  const { model, edit, handleOpenCooperateModal } = props
 
-  const [isQRModalOpened, setIsQRModalOpened] = useState(false);
-  const openModal = () => { setIsQRModalOpened(true) };
-  const closeModal = () => { setIsQRModalOpened(false) };
+  const [isDetailsModalOpened, setDetailsModalOpened] = useState(false);
+  const openModal = () => { setDetailsModalOpened(true) };
+  const closeModal = () => { setDetailsModalOpened(false) };
 
   const deleteProduct = useCallback(() => {
     if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`)) {
@@ -234,9 +234,9 @@ const Product = props => {
               </div>
             }
           </div>
-          <ProductDetailsModal isOpened={isQRModalOpened} onClose={closeModal} details={model} />
+          <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={closeModal} details={model} />
           {model.isForCooperate && 
-            <Button onClick={openModal} endIcon={<InfoIcon />}>
+            <Button onClick={handleOpenCooperateModal} endIcon={<InfoIcon />}>
               Товар для кооперации
             </Button>
           }
@@ -320,6 +320,7 @@ import EditorField from './EditorField'
 import CurrentProcurement from './CurrentProcurement'
 import ProductDetailsModal from './ProductDetailsModal';
 import { Badge } from '@mui/material';
+import CooperateModal from './CooperateModal';
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
@@ -376,6 +377,10 @@ export default () => {
   const [edit, toggleEdit] = useToggle(false)
   const products = useFirebaseValue('products', [], categorize)
 
+  const [isCooperateModalOpened, setCooperateModalOpened] = useState(false);
+  const openModal = () => { setCooperateModalOpened(true) };
+  const closeModal = () => { setCooperateModalOpened(false) };
+
   return (
     <Root>
       <PageTitle>
@@ -404,6 +409,7 @@ export default () => {
                 model={p}
                 admin={admin}
                 edit={edit}
+                handleOpenCooperateModal={openModal}
               />)}
             </div>
             </AccordionDetails>
@@ -411,6 +417,7 @@ export default () => {
           </React.Fragment>
         )}
       </section>
+      <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
     </Root>
   )
 }
