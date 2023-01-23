@@ -202,8 +202,6 @@ const Product = props => {
     }
   }, [model])
 
-  const unitName = model.isForCooperate ? 'шт.' : model.unitName;
-
   const addToBasket = useCallback(() => addToCart(count, model), [count, model])
 
   const canBuy = !!model.price  
@@ -224,7 +222,7 @@ const Product = props => {
           <div className='product-section product-section-grid'>
             <div>
               <p className='product-label'>фасовка:</p>
-              <p>{model.unit || '-'} {unitName}</p>
+              <p>{model.unit || '-'} {model.unitName}</p>
             </div>
             {(model.description || model.about) && 
               <div>
@@ -244,7 +242,7 @@ const Product = props => {
             <div>
               <p className='product-price'>{model.price ? toCurrencyStringRu(model.price) : '-'}</p>
               <p className='product-unit-price'>
-                {(model.unitPrice && `${model.unitPrice} ₽ за 1 ${unitName}`)}
+                {(model.unitPrice && `${model.unitPrice} ₽ за 1 ${model.unitName}`)}
                 &nbsp;
               </p>
             </div>
