@@ -373,12 +373,6 @@ export const Cart = ({ products = {} }) => {
 
   const placeOrder = useCallback(() => {
     const phone = auth.currentUser.phoneNumber;
-    console.log({
-      wantToCooperate,
-      wantToChange,
-      cooperateDetails,
-      isRemoveIfNotCalled
-    });
     database
       .ref(`orders/${auth.currentUser.uid}`)
       .push({
