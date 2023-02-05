@@ -52,7 +52,7 @@ export default function ProductDetailsModal({ isOpened, onClose }: IAlertDialog)
         >
             <DialogTitle id="cooperate-dialog-title">
                 <Heading>
-                    Товары для кооперации
+                    Продукты для кооперации
                 </Heading>
             </DialogTitle>
             <DialogContent id="cooperate-dialog-description">

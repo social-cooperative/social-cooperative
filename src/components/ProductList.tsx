@@ -235,7 +235,7 @@ const Product = props => {
           <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={closeModal} details={model} />
           {model.isForCooperate && 
             <Button onClick={handleOpenCooperateModal} endIcon={<InfoIcon />}>
-              Товар для кооперации
+              Продукт для кооперации
             </Button>
           }
           <footer className='product-section product-section-grid'>
