@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography'
 import styled from 'styled-components'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { productsTotal, subscribe, toCurrencyStringRu, useSelector, useToggle } from '../utils'
+import { productsTotal, subscribe, toCurrencyStringRu, toLocaleStringRu, useSelector, useToggle } from '../utils'
 import { database } from '../firebase'
 import { Table } from './Table'
 import { Order } from './Orders'
@@ -81,6 +81,16 @@ const useProducts = orders => {
       }
     }
   }
+  // console.log(JSON.stringify(Object.values(products).reduce((acc, product) => {
+  //   acc.push({
+  //     'Название': product.name,
+  //      'Категория': product.category,
+  //      'Количество': product.count,
+  //      'Цена': product.price,
+  //      'Сумма': product.price * product.count,
+  //   })
+  //   return acc;
+  // }, [])))
   const categories = categorize(products)
   for (const category in categories) {
     categories[category] = {
@@ -134,6 +144,43 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
         })))
     }))
   }, [orders])
+
+  // console.log(JSON.stringify(Object.values(orders).flatMap(order => Object.values(order)).map((order) => ({
+  //   'Дата': new Date(order.date).toISOString(),
+  //   'Имя': order.name,
+  //   'Адрес': order.address,
+  //   'Телефон': order.phone,
+  //   'Комментарий': order.comment,
+  //   'Есть товары с заменой?': order.wantToChange ? 'Да' : 'Нет',
+  //   'Есть товары для кооперации?': order.wantToCooperate ? 'Да' : 'Нет',
+  //   'Детали кооперации': order.cooperateDetails, 
+  // }))));
+
+  // console.log(JSON.stringify(generateListFromOrders(orders).sort((a, b) => b.date - a.date).reduce((acc, order, index) => {
+  //   acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
+  //     accum.push({
+  //       index,
+  //       'Детали заказа': 
+  //       `Заказ от ${toLocaleStringRu(order.date)} ${order.phone} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
+  //       + `${order.name}\n`
+  //       + `${order.address}\n`
+  //       + `${order.comment}\n`
+  //       + `${order.wantToChange ? 'Есть товары с заменой, в случае недозвона' : ''} ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`
+  //       + `${order.wantToCooperate ? 'Есть товары с кооперацией\n\n' : ''}`
+  //       + `${order.wantToCooperate ? 'Детали кооперации: \n' : ''}`
+  //       + `${order.wantToCooperate ? order.cooperateDetails : ''}`,
+  //       'Название': product.name,
+  //       'Количество': count,
+  //       'Для замены': forChange ? 'Да' : 'Нет',
+  //       'Для кооперации': forCooperate ? 'Да' : 'Нет',
+  //       'Цена': product.price,
+  //       'Сумма': product.price * count,
+  //       'Категория': product.category,
+  //     })
+  //     return accum;
+  //   }, []))
+  //   return acc;
+  // }, []).flat()))
 
   return (
     <Root>

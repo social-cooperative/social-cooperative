@@ -11,7 +11,7 @@ const getDetails = ({ total, timestamp, phone }: IPayDetails) => ({
     CorrespAcc: '30101810845250000999',
     PayeeINN: '9715431330',
     KPP: '771501001',
-    Purpose: `Паевой взнос №${timestamp.trim()} @${phone.trim()}. Без НДС`,
+    Purpose: `Паевой взнос №${Number(timestamp.trim())} @${phone.trim()}. Без НДС`,
     Sum: Number(`${total}00`),
   })
   
