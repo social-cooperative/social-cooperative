@@ -280,7 +280,7 @@ export const Cart = ({ products = {} }) => {
       return true;
     }
 
-    // Если человек хочет заменить товар, если что, но не оставил инфу
+    // Если человек хочет заменить продукт, если что, но не оставил инфу
     // на случай, если мы ему не дозвонимся
     if (wantToChange && isRemoveIfNotCalled === null) {
       return true;
@@ -422,7 +422,7 @@ export const Cart = ({ products = {} }) => {
             </td>
             <td>
               <Typography style={{ textAlign: 'center', fontSize: '14px' }}>
-                Согласовывать замену товара
+                Согласовывать замену
               </Typography>
             </td>
             {allowCooperate && (
@@ -531,8 +531,7 @@ export const Cart = ({ products = {} }) => {
                           variant='h6'
                           style={{ marginBottom: '12px' }}
                         >
-                          Как поступить, если мы не дозвонились вам для замены
-                          товара?
+                          Как поступить, если мы не дозвонились вам для замены?
                         </Typography>
                         <RadioGroup
                           name='radio-buttons-group'
@@ -542,7 +541,7 @@ export const Cart = ({ products = {} }) => {
                           <FormControlLabel
                             value={true}
                             control={<Radio />}
-                            label='Убрать товар из корзины'
+                            label='Убрать из корзины'
                           />
                           <FormControlLabel
                             value={false}

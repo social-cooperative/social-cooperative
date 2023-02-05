@@ -274,7 +274,7 @@ const Product = props => {
           </div>
           
           <div className='product-section'>
-            <p className='product-label'>товар для кооперации:</p>
+            <p className='product-label'>продукт для кооперации:</p>
             <FirebaseEditorCheckbox path={`/products/${model.id}/isForCooperate`} value={model.isForCooperate} enabled={edit} />
           </div>
           <div className='product-section'>
@@ -303,7 +303,7 @@ const Product = props => {
       }
       </div>
       {!edit && <button disabled={!canBuy} className='product-buy' onClick={addToBasket}>В корзину</button>}
-      {edit && <button className='product-remove' onClick={deleteProduct}>Удалить товар</button>}
+      {edit && <button className='product-remove' onClick={deleteProduct}>Удалить</button>}
     </article>
   )
 }
