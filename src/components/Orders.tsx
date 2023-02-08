@@ -162,7 +162,7 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
         </Typography>}
         {!!order.wantToChange && 
           <Typography align="left">
-            Есть продукты для замены, в случае недозвона {optionForNotCalled} товары
+            Есть продукты для замены, в случае недозвона {optionForNotCalled} продукты
           </Typography>
         }
         {!!order.wantToCooperate && 

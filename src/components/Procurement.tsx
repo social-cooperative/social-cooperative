@@ -151,8 +151,8 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
   //   'Адрес': order.address,
   //   'Телефон': order.phone,
   //   'Комментарий': order.comment,
-  //   'Есть товары с заменой?': order.wantToChange ? 'Да' : 'Нет',
-  //   'Есть товары для кооперации?': order.wantToCooperate ? 'Да' : 'Нет',
+  //   'Есть продукты с заменой?': order.wantToChange ? 'Да' : 'Нет',
+  //   'Есть продукты для кооперации?': order.wantToCooperate ? 'Да' : 'Нет',
   //   'Детали кооперации': order.cooperateDetails, 
   // }))));
 
@@ -165,8 +165,8 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
   //       + `${order.name}\n`
   //       + `${order.address}\n`
   //       + `${order.comment}\n`
-  //       + `${order.wantToChange ? 'Есть товары с заменой, в случае недозвона' : ''} ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`
-  //       + `${order.wantToCooperate ? 'Есть товары с кооперацией\n\n' : ''}`
+  //       + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''} ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`
+  //       + `${order.wantToCooperate ? 'Есть продукты с кооперацией\n\n' : ''}`
   //       + `${order.wantToCooperate ? 'Детали кооперации: \n' : ''}`
   //       + `${order.wantToCooperate ? order.cooperateDetails : ''}`,
   //       'Название': product.name,
