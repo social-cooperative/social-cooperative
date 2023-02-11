@@ -145,6 +145,8 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
     }))
   }, [orders])
 
+  // TODO: ОТЧЁТЫ
+
   // console.log(JSON.stringify(Object.values(orders).flatMap(order => Object.values(order)).map((order) => ({
   //   'Дата': new Date(order.date).toISOString(),
   //   'Имя': order.name,
@@ -160,10 +162,11 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
   //   acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
   //     accum.push({
   //       index,
+  //       'Номер': order.phone,
+  //       'Адрес': order.address,
   //       'Детали заказа': 
-  //       `Заказ от ${toLocaleStringRu(order.date)} ${order.phone} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
+  //       `Заказ от ${toLocaleStringRu(order.date)} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
   //       + `${order.name}\n`
-  //       + `${order.address}\n`
   //       + `${order.comment}\n`
   //       + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''} ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`
   //       + `${order.wantToCooperate ? 'Есть продукты с кооперацией\n\n' : ''}`
