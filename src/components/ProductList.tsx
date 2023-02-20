@@ -242,7 +242,7 @@ const Product = props => {
             <div>
               <p className='product-price'>{model.price ? toCurrencyStringRu(model.price) : '-'}</p>
               <p className='product-unit-price'>
-                {(model.unitPrice && `${model.unitPrice} ₽ за 1 ${model.unitName}`)}
+                {(!!model.unitPrice && `${model.unitPrice} ₽ за 1 ${model.unitName}`)}
                 &nbsp;
               </p>
             </div>
