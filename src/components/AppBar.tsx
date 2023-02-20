@@ -99,7 +99,7 @@ export default () => {
               <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
             </a>
           </div>
-          <IconButton href="/Каталог" title="Каталог">
+          <IconButton href="/catalog" title="Каталог">
             <StoreIcon />
           </IconButton>
           <A href="/store" style={{ color: 'rgba(0,0,0,0.54)' }} title="Каталог">
