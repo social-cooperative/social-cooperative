@@ -272,10 +272,13 @@ const Product = props => {
             <p className='product-label'>внутренний комментарий (будет внутри модалки):</p>
             <FirebaseEditorField path={`/products/${model.id}/about`} value={model.about} enabled={edit} />
           </div>
-          
           <div className='product-section'>
             <p className='product-label'>продукт для кооперации:</p>
             <FirebaseEditorCheckbox path={`/products/${model.id}/isForCooperate`} value={model.isForCooperate} enabled={edit} />
+          </div>
+          <div className='product-section'>
+            <p className='product-label'>скрыть товар:</p>
+            <FirebaseEditorCheckbox path={`/products/${model.id}/hidden`} value={model.hidden} enabled={edit} />
           </div>
           <div className='product-section'>
             <p className='product-label'>фасовка (число):</p>
@@ -371,51 +374,90 @@ const overwriteProducts = () => {
 }
 
 export default () => {
-  const admin = useSelector(adminSelector)
-  const [edit, toggleEdit] = useToggle(false)
-  const products = useFirebaseValue('products', [], categorize)
+  const admin = useSelector(adminSelector);
+  const [edit, toggleEdit] = useToggle(false);
+  const products = useFirebaseValue('products', [], categorize);
 
   const [isCooperateModalOpened, setCooperateModalOpened] = useState(false);
-  const openModal = () => { setCooperateModalOpened(true) };
-  const closeModal = () => { setCooperateModalOpened(false) };
+  const openModal = () => {
+    setCooperateModalOpened(true);
+  };
+  const closeModal = () => {
+    setCooperateModalOpened(false);
+  };
 
   return (
     <Root>
       <PageTitle>
         Каталог
-        {admin && <button style={{ float: 'right' }} onClick={toggleEdit}>{edit ? '💾' : '✏️'}</button>}
-        {edit && <button style={{ float: 'right' }} onClick={overwriteProducts}>🗃️</button>}
-        {edit && <button style={{ float: 'right' }} onClick={addProduct()}>➕</button>}
+        {admin && (
+          <button style={{ float: 'right' }} onClick={toggleEdit}>
+            {edit ? '💾' : '✏️'}
+          </button>
+        )}
+        {edit && (
+          <button style={{ float: 'right' }} onClick={overwriteProducts}>
+            🗃️
+          </button>
+        )}
+        {edit && (
+          <button style={{ float: 'right' }} onClick={addProduct()}>
+            ➕
+          </button>
+        )}
       </PageTitle>
       <section>
-        <CurrentProcurement edit={edit}/>
+        <CurrentProcurement edit={edit} />
       </section>
       <section>
-        {Object.entries<any>(products).map(([category, products]) =>
-          <React.Fragment key={category}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <div className="category">
-                  <CategoryEditorField category={category} products={products} enabled={edit} />
-                  {edit && <button style={{ float: 'right' }} onClick={addProduct(category)}>➕</button>}
-                </div>
-            </AccordionSummary>
-            <AccordionDetails>
-            <div className='product-list'>
-              {products.map((p, i) => <Product
-                key={p.id}
-                model={p}
-                admin={admin}
-                edit={edit}
-                handleOpenCooperateModal={openModal}
-              />)}
-            </div>
-            </AccordionDetails>
-            </Accordion>
-          </React.Fragment>
-        )}
+        {Object.entries<any>(products).reduce((accum, [category, products]) => {
+          if (products.some(({ hidden }) => hidden !== true) || edit) {
+            accum.push(
+              <React.Fragment key={category}>
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <div className='category'>
+                      <CategoryEditorField
+                        category={category}
+                        products={products}
+                        enabled={edit}
+                      />
+                      {edit && (
+                        <button
+                          style={{ float: 'right' }}
+                          onClick={addProduct(category)}
+                        >
+                          ➕
+                        </button>
+                      )}
+                    </div>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <div className='product-list'>
+                      {products.reduce((acc, product) => {
+                        if (!product.hidden || edit) {
+                          acc.push(
+                            <Product
+                              key={product.id}
+                              model={product}
+                              admin={admin}
+                              edit={edit}
+                              handleOpenCooperateModal={openModal}
+                            />
+                          );
+                        }
+                        return acc;
+                      }, [])}
+                    </div>
+                  </AccordionDetails>
+                </Accordion>
+              </React.Fragment>
+            );
+          }
+          return accum;
+        }, [])}
       </section>
       <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
     </Root>
-  )
-}
+  );
+};
