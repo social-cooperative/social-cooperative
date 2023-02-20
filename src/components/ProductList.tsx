@@ -386,6 +386,20 @@ export default () => {
     setCooperateModalOpened(false);
   };
 
+  const categoryList = (products) => Object.entries<any>(products).reduce((acc, [category, products]) => {
+    if (products.some(({ hidden }) => hidden !== true) || edit) {
+      acc.push([category, products])
+    }
+    return acc;
+  }, [])
+  
+  const productList = (products, edit) => products.reduce((acc, product) => {
+    if (!product.hidden || edit) {
+      acc.push(product);
+    }
+    return acc;
+  }, [])
+
   return (
     <Root>
       <PageTitle>
@@ -410,16 +424,14 @@ export default () => {
         <CurrentProcurement edit={edit} />
       </section>
       <section>
-        {Object.entries<any>(products).reduce((accum, [category, products]) => {
-          if (products.some(({ hidden }) => hidden !== true) || edit) {
-            accum.push(
+        {categoryList(products).map(([category, items]) =>
               <React.Fragment key={category}>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <div className='category'>
                       <CategoryEditorField
                         category={category}
-                        products={products}
+                        products={items}
                         enabled={edit}
                       />
                       {edit && (
@@ -434,28 +446,20 @@ export default () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <div className='product-list'>
-                      {products.reduce((acc, product) => {
-                        if (!product.hidden || edit) {
-                          acc.push(
-                            <Product
-                              key={product.id}
-                              model={product}
-                              admin={admin}
-                              edit={edit}
-                              handleOpenCooperateModal={openModal}
-                            />
-                          );
-                        }
-                        return acc;
-                      }, [])}
+                      {productList(items, edit).map((item) =>  
+                        <Product
+                          key={item.id}
+                          model={item}
+                          admin={admin}
+                          edit={edit}
+                          handleOpenCooperateModal={openModal}
+                        />
+                      )}
                     </div>
                   </AccordionDetails>
                 </Accordion>
               </React.Fragment>
-            );
-          }
-          return accum;
-        }, [])}
+        )}
       </section>
       <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
     </Root>
