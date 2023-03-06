@@ -234,6 +234,11 @@ const Product = props => {
             </div>
             <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={closeModal} details={model} />
             {model.slotCount && model.slotCount > 1 &&
+              <Button onClick={handleOpenCooperateModal} endIcon={<InfoIcon />}>
+                Продукт для кооперации
+              </Button>
+            }
+            {model.slotCount && model.slotCount > 1 &&
               <Slots slots={model.slotCount} leftover={model.leftoverSlotCount} picked={pickedSlots} />
             }
             <footer className='product-section product-section-grid'>
