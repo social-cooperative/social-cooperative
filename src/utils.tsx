@@ -379,7 +379,6 @@ export const proxy_events = (source: TinyEventEmitter, dest: TinyEventEmitter, .
 }
 
 import { useSelector as _useSelector, shallowEqual, useStore } from 'react-redux'
-import { defaultClassName } from 'react-mapbox-gl/lib/popup'
 import { database } from './firebase'
 
 export function useSelector(selector = identity, comparator: typeof shallowEqual | false = shallowEqual) {

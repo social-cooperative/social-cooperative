@@ -1,9 +1,9 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle }from '@mui/material';
-import styled from 'styled-components';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
+import styled from 'styled-components'
 
 interface IAlertDialog {
-    isOpened: boolean;
-    onClose: () => void;
+    isOpened: boolean
+    onClose: () => void
 }
 
 const Root = styled.div`
@@ -43,12 +43,12 @@ const List = styled.ol`
 `
 
 export default function ProductDetailsModal({ isOpened, onClose }: IAlertDialog) {
-  return (
+    return (
         <Dialog
-        open={isOpened}
-        onClose={onClose}
-        aria-labelledby="cooperate-dialog-title"
-        aria-describedby="cooperate-dialog-description"
+            open={isOpened}
+            onClose={onClose}
+            aria-labelledby="cooperate-dialog-title"
+            aria-describedby="cooperate-dialog-description"
         >
             <DialogTitle id="cooperate-dialog-title">
                 <Heading>
@@ -63,7 +63,7 @@ export default function ProductDetailsModal({ isOpened, onClose }: IAlertDialog)
                     <Description>
                         Для покупки таких продуктов мы предлагаем пайщикам кооперироваться в таком формате:
                     </Description>
-                       <List>
+                    <List>
                         <li>Пайщики договариваются в чате о кооперации;</li>
                         <li>Пайщик №1 кладет себе в корзину продукт помеченный для кооперации;</li>
                         <li>
@@ -75,12 +75,15 @@ export default function ProductDetailsModal({ isOpened, onClose }: IAlertDialog)
                         </li>
                         <li>Пайщик № 1 оплачивает 100% продукта;</li>
                         <li>Расчет между собой пайщики № 1 и № 2 производят самостоятельно.</li>
-                       </List>
+                    </List>
+                    <Description as="i" style={{ fontSize: 'smaller' }}>
+                        * Мы оставляем за собой право отказать в покупке товаров по кооперации, если заполнено меньше 2/3 слотов по данному продукту, а если после удаления такой позиции из заказа его сумма будет меньше 3000 рублей, то с вами свяжется наш сотрудник для согласования дозаполнения корзины до нужной суммы.
+                    </Description>
                 </Root>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Закрыть</Button>
             </DialogActions>
         </Dialog>
-  );
+    )
 }

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Checkbox } from '@mui/material'
 
-export const EditorCheckbox = ({ value, onSave, immediate = true }) => {
+export const EditorCheckbox = ({ value, onSave, immediate = true, ...rest }) => {
   const [checked, setChecked] = useState(!!value);
 
   const onChange = useCallback((event) => {
@@ -10,6 +10,7 @@ export const EditorCheckbox = ({ value, onSave, immediate = true }) => {
   }, [immediate, onSave]);
 
   return <Checkbox
+      {...rest }
       checked={checked}
       onChange={onChange}
     />

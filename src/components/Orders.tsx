@@ -33,8 +33,6 @@ export const Product = props => {
           {!!model.product.category && <small>({model.product.category})</small>}
           &nbsp;
           {!!model.forChange && <ChangeCircleIcon color="success" style={{verticalAlign: 'middle'}}/>}
-          &nbsp;
-          {!!model.forCooperate && <PeopleIcon color="primary" style={{verticalAlign: 'middle'}}/>}
         </Typography>
       </td><td>
         <Typography>
