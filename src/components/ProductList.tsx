@@ -295,8 +295,12 @@ const Product = props => {
               <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={edit} />
             </div>
             <div className='product-section'>
-              <p className='product-label'>ед. измерения фасовки (кг. / шт. / л.):</p>
+              <p className='product-label'>ед. измерения фасовки (кг / л / шт.):</p>
               <FirebaseEditorField path={`/products/${model.id}/unitName`} value={model.unitName} enabled={edit} />
+            </div>
+            <div className='product-section'>
+              <p className='product-label'>вес (кг):</p>
+              <FirebaseEditorField path={`/products/${model.id}/weight`} value={model.weight} enabled={edit} />
             </div>
             <div className='product-section'>
               <p className='product-label'>ссылка на отзыв:</p>
