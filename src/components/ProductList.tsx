@@ -4,12 +4,22 @@ import { auth, database, storage } from '../firebase'
 import { CellImg } from './Table'
 import { toCurrencyStringRu, useFirebaseValue } from '../utils'
 
-import Accordion from '@mui/material/Accordion'
 import Button from '@mui/material/Button'
 import InfoIcon from '@mui/icons-material/Info'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
+
+
+import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+/*
+const Accordion = 'details'
+const AccordionSummary = 'summary'
+const AccordionDetails = 'div'
+*/
+
+
 
 const Root = styled.div`
   padding: 1em;
@@ -439,8 +449,7 @@ export default () => {
       </section>
       <section>
         {categoryList(products).map(([category, items]) =>
-          <React.Fragment key={category}>
-            <Accordion>
+            <Accordion key={category} TransitionProps={{ unmountOnExit: true }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <div className='category'>
                   <CategoryEditorField
@@ -473,7 +482,6 @@ export default () => {
                 </div>
               </AccordionDetails>
             </Accordion>
-          </React.Fragment>
         )}
       </section>
       <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
