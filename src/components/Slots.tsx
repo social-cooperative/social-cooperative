@@ -80,7 +80,7 @@ const SlotsPure = ({ slots = 0, leftover = 0, picked = 0 }) => {
           {Array(grays).fill(null).map((_, i) => <SlotGray key={i} />)}
           {Array(whiteGrays).fill(null).map((_, i) => <SlotWhiteGray key={i} />)}
         </SlotsRoot>
-        <Right>Осталось докупить {whiteGrays} шт. из остатков</Right>
+        <Right>{whiteGrays} шт. в наличии</Right>
       </>
     }
     {!!slots && <>

@@ -147,17 +147,29 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
 
   // TODO: ОТЧЁТЫ
 
-  // console.log(JSON.stringify(Object.values(orders).flatMap(order => Object.values(order)).map((order) => ({
-  //   'Дата': new Date(order.date).toISOString(),
-  //   'Имя': order.name,
-  //   'Адрес': order.address,
-  //   'Телефон': order.phone,
-  //   'Комментарий': order.comment,
-  //   'Есть продукты с заменой?': order.wantToChange ? 'Да' : 'Нет',
-  //   'Есть продукты для кооперации?': order.wantToCooperate ? 'Да' : 'Нет',
-  //   'Детали кооперации': order.cooperateDetails, 
-  // }))));
+  // Пономенклатурный отчёт
+  // console.log(JSON.stringify(Object.values(Object.values(orders)
+  //   .flatMap(item => Object.values(item))
+  //   .flatMap(({products}) => Object.values(products))
+  //   .reduce((acc, {count, product} /** [{count, product}]*/) => {
+  //     if (acc[product.id]) {
+  //       acc[product.id]['Количество'] += count;
+  //       acc[product.id]['Сумма'] += count* product.price;
+  //     } else {
+  //       acc[product.id] = {
+  //         'Название': product.name,
+  //         'Категория': product.category,
+  //         'Количество': count,
+  //         'Слоты':  product.slotCount ?? 1,
+  //         'Цена': product.price,
+  //         'Сумма': product.price * count,
+  //         'Фасовка': `${product.unit} ${product.unitName}`,
+  //       }
+  //     }
+  //     return acc;
+  //   }, {}))));
 
+    // Позаказный отчёт
   // console.log(JSON.stringify(generateListFromOrders(orders).sort((a, b) => b.date - a.date).reduce((acc, order, index) => {
   //   acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
   //     accum.push({
@@ -168,12 +180,11 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
   //       `Заказ от ${toLocaleStringRu(order.date)} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
   //       + `${order.name}\n`
   //       + `${order.comment}\n`
-  //       + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''} ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`
-  //       + `${order.wantToCooperate ? 'Есть продукты с кооперацией\n\n' : ''}`
-  //       + `${order.wantToCooperate ? 'Детали кооперации: \n' : ''}`
-  //       + `${order.wantToCooperate ? order.cooperateDetails : ''}`,
+  //       + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''}
+  //          ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`,
   //       'Название': product.name,
   //       'Количество': count,
+  //       'Слоты': product.slotsCount,
   //       'Для замены': forChange ? 'Да' : 'Нет',
   //       'Для кооперации': forCooperate ? 'Да' : 'Нет',
   //       'Цена': product.price,

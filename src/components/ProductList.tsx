@@ -244,6 +244,11 @@ const Product = props => {
             </div>
             <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={closeModal} details={model} />
             {model.slotCount && model.slotCount > 1 &&
+              <Button onClick={handleOpenCooperateModal} endIcon={<InfoIcon />}>
+                Продукт для кооперации
+              </Button>
+            }
+            {model.slotCount && model.slotCount > 1 &&
               <Slots slots={model.slotCount} leftover={model.leftoverSlotCount} picked={pickedSlots} />
             }
             <footer className='product-section product-section-grid'>
@@ -300,8 +305,12 @@ const Product = props => {
               <FirebaseEditorField path={`/products/${model.id}/unit`} value={model.unit} enabled={edit} />
             </div>
             <div className='product-section'>
-              <p className='product-label'>ед. измерения фасовки (кг. / шт. / л.):</p>
+              <p className='product-label'>ед. измерения фасовки (кг / л / шт.):</p>
               <FirebaseEditorField path={`/products/${model.id}/unitName`} value={model.unitName} enabled={edit} />
+            </div>
+            <div className='product-section'>
+              <p className='product-label'>вес (кг):</p>
+              <FirebaseEditorField path={`/products/${model.id}/weight`} value={model.weight} enabled={edit} />
             </div>
             <div className='product-section'>
               <p className='product-label'>ссылка на отзыв:</p>
@@ -331,7 +340,6 @@ import PageTitle from './PageTitle'
 import EditorField from './EditorField'
 import CurrentProcurement from './CurrentProcurement'
 import ProductDetailsModal from './ProductDetailsModal'
-import { Badge } from '@mui/material'
 import CooperateModal from './CooperateModal'
 import { Slots } from './Slots'
 
@@ -351,7 +359,7 @@ export const categorize = products => {
   return Object.fromEntries(Object.entries(categories).sort((a, b) => a[0] > b[0] ? 1 : -1)) as any
 }
 
-export const stitchPickedSlots = carts => {
+export const stitchPickedSlotsInCarts = carts => {
   const pickedSlots = {}
   for (const items of Object.values(carts || {}))
     for (const item of Object.values(items))
@@ -360,6 +368,17 @@ export const stitchPickedSlots = carts => {
       else
         pickedSlots[item.product.id] = item.count || 0
   return pickedSlots
+}
+
+export const stitchPickedSlotsInOrders = (orders) => { 
+  if (!orders) return {};
+  return Object.values(orders)
+    .flatMap(item => Object.values(item))
+    .flatMap(({products}) => Object.values(products))
+    .reduce((acc, {count, product} /** [{count, product}]*/) => {
+      acc[product.id] = acc[product.id] ? acc[product.id] + count : count;
+      return acc;
+    }, {});
 }
 
 const addProduct = (category?) => () => {
@@ -400,7 +419,12 @@ export default () => {
   const admin = useSelector(adminSelector)
   const [edit, toggleEdit] = useToggle(false)
   const products = useFirebaseValue('products', [], categorize)
-  const pickedSlots = useFirebaseValue('carts', {}, stitchPickedSlots)
+  const pickedSlotsInCarts = useFirebaseValue('carts', {}, stitchPickedSlotsInCarts)
+  const pickedSlotsInOrders = useFirebaseValue('orders', {}, stitchPickedSlotsInOrders)
+  const pickedSlots = Object.entries(pickedSlotsInOrders).reduce((acc, [id, count]) => {
+    acc[id] = acc[id] ? acc[id] + count : count;
+    return acc;
+  }, pickedSlotsInCarts)
 
   const [isCooperateModalOpened, setCooperateModalOpened] = useState(false)
   const openModal = () => {
