@@ -390,7 +390,8 @@ export const stitchPickedSlotsInOrders = (orders) => {
     }, {})
 }
 
-const addProduct = (category?) => () => {
+const addProduct = (category?) => event => {
+  event.stopPropagation()
   if (!category) {
     category = prompt('Введите категорию продукта')
     if (!category) return
