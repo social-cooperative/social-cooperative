@@ -473,7 +473,7 @@ export default () => {
       </section>
       <section>
         {categoryList(products).map(([category, items]) =>
-            <Accordion key={category} TransitionProps={{ unmountOnExit: true }}>
+            <Accordion key={category} TransitionProps={{ unmountOnExit: true, timeout: 200 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <div className='category'>
                   <CategoryEditorField
