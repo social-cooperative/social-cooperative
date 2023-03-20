@@ -171,6 +171,14 @@ const Root = styled.div`
   }
 `
 
+const GrayLabel = styled.div`
+  background: gray;
+  color: white;
+  text-align: center;
+  padding: 0.2em;
+  margin: 0.2em 0;
+`
+
 const truncate = (str: string | undefined, n: number) => {
   if (!str) return ''
   return str.length <= n ? str : str.substring(0, n + 1) + '...'
@@ -222,6 +230,7 @@ const Product = props => {
         <FirebaseImageUploader src={model.image} saveAs={`products/${model.id}`} databasePath={`/products/${model.id}/image`} component={CellImg} enabled={edit} />
       </div>
       <div className="product-body">
+        {model.hidden && <GrayLabel>Скрытый</GrayLabel>}
         {
           !edit &&
           <React.Fragment>
@@ -370,15 +379,15 @@ export const stitchPickedSlotsInCarts = carts => {
   return pickedSlots
 }
 
-export const stitchPickedSlotsInOrders = (orders) => { 
-  if (!orders) return {};
+export const stitchPickedSlotsInOrders = (orders) => {
+  if (!orders) return {}
   return Object.values(orders)
     .flatMap(item => Object.values(item))
-    .flatMap(({products}) => Object.values(products))
-    .reduce((acc, {count, product} /** [{count, product}]*/) => {
-      acc[product.id] = acc[product.id] ? acc[product.id] + count : count;
-      return acc;
-    }, {});
+    .flatMap(({ products }) => Object.values(products))
+    .reduce((acc, { count, product } /** [{count, product}]*/) => {
+      acc[product.id] = acc[product.id] ? acc[product.id] + count : count
+      return acc
+    }, {})
 }
 
 const addProduct = (category?) => () => {
@@ -422,8 +431,8 @@ export default () => {
   const pickedSlotsInCarts = useFirebaseValue('carts', {}, stitchPickedSlotsInCarts)
   const pickedSlotsInOrders = useFirebaseValue('orders', {}, stitchPickedSlotsInOrders)
   const pickedSlots = Object.entries(pickedSlotsInOrders).reduce((acc, [id, count]) => {
-    acc[id] = acc[id] ? acc[id] + count : count;
-    return acc;
+    acc[id] = acc[id] ? acc[id] + count : count
+    return acc
   }, pickedSlotsInCarts)
 
   const [isCooperateModalOpened, setCooperateModalOpened] = useState(false)
@@ -473,39 +482,39 @@ export default () => {
       </section>
       <section>
         {categoryList(products).map(([category, items]) =>
-            <Accordion key={category} TransitionProps={{ unmountOnExit: true, timeout: 200 }}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <div className='category'>
-                  <CategoryEditorField
-                    category={category}
-                    products={items}
-                    enabled={edit}
+          <Accordion key={category} TransitionProps={{ unmountOnExit: true, timeout: 200 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <div className='category'>
+                <CategoryEditorField
+                  category={category}
+                  products={items}
+                  enabled={edit}
+                />
+                {edit && (
+                  <button
+                    style={{ float: 'right' }}
+                    onClick={addProduct(category)}
+                  >
+                    ➕
+                  </button>
+                )}
+              </div>
+            </AccordionSummary>
+            <AccordionDetails>
+              <div className='product-list'>
+                {productList(items, edit).map((item) =>
+                  <Product
+                    key={item.id}
+                    model={item}
+                    admin={admin}
+                    edit={edit}
+                    pickedSlots={pickedSlots[item.id]}
+                    handleOpenCooperateModal={openModal}
                   />
-                  {edit && (
-                    <button
-                      style={{ float: 'right' }}
-                      onClick={addProduct(category)}
-                    >
-                      ➕
-                    </button>
-                  )}
-                </div>
-              </AccordionSummary>
-              <AccordionDetails>
-                <div className='product-list'>
-                  {productList(items, edit).map((item) =>
-                    <Product
-                      key={item.id}
-                      model={item}
-                      admin={admin}
-                      edit={edit}
-                      pickedSlots={pickedSlots[item.id]}
-                      handleOpenCooperateModal={openModal}
-                    />
-                  )}
-                </div>
-              </AccordionDetails>
-            </Accordion>
+                )}
+              </div>
+            </AccordionDetails>
+          </Accordion>
         )}
       </section>
       <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
