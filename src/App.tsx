@@ -64,6 +64,10 @@ const CssGlobals = createGlobalStyle`
 html {
   font-family: Inter, sans-serif;
 }
+
+.firebaseui-dialog {
+  top: 0 !important;
+}
 `
 
 const logoutAndReload = () => logout().then(() => location.reload())
