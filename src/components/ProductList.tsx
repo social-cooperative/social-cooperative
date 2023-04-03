@@ -222,15 +222,40 @@ const Product = props => {
 
   const addToBasket = useCallback(() => addToCart(count, model), [count, model])
 
+  const pasteFromTable = useCallback(() => {
+    navigator.clipboard.readText().then(text => {
+      const cells = text.split('\t')
+      if (cells.length !== 36) {
+        alert('Неправильный формат данных: в строке должно быть ровно 36 столбцов')
+        return
+      }
+      const comment = cells[35] || undefined
+      const name = cells[27]
+      const price = +((cells[28] || '').replace(',', '.'))
+      const unit = cells[23]
+      if (!(cells && name && price && unit)) {
+        alert('Неправильный формат данных: отсутствует цена, наименование или фасовка (число)')
+        return
+      }
+      const weight = cells[22] === 'кг' ? (+((cells[21] || '').replace(',', '.')) || '') : null
+      database.ref(`/products/${model.id}`).update({
+        comment,
+        name,
+        price,
+        unit,
+        weight
+      }).catch(() => { })
+    })
+  }, [model])
+
   const canBuy = !!model.price
 
   return (
-    <article className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
+    <article className="product" style={{ background: props.darker ? 'gray' : undefined, opacity: model.hidden ? 0.4 : 1 }}>
       <div className="product-image">
         <FirebaseImageUploader src={model.image} saveAs={`products/${model.id}`} databasePath={`/products/${model.id}/image`} component={CellImg} enabled={edit} />
       </div>
       <div className="product-body">
-        {model.hidden && <GrayLabel>Скрытый</GrayLabel>}
         {
           !edit &&
           <React.Fragment>
@@ -274,6 +299,8 @@ const Product = props => {
         }{
           edit &&
           <React.Fragment>
+            {<small style={{ textAlign: 'center', opacity: 0.4 }}>{model.id}</small>}
+            <Button fullWidth onClick={pasteFromTable} variant="outlined" size="small" style={{ margin: '0.3em 0' }}>Вставить из таблицы</Button>
             <div className='product-section'>
               <p className='product-label'>название:</p>
               <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
