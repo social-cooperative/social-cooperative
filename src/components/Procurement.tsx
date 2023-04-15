@@ -9,6 +9,7 @@ import { Order } from './Orders'
 import PageTitle from './PageTitle'
 import { categorize } from './ProductList'
 import { Button } from '@mui/material'
+import csvDownload from 'json-to-csv-export'
 
 const Root = styled.div`
   padding: 1em;
@@ -81,16 +82,7 @@ const useProducts = orders => {
       }
     }
   }
-  // console.log(JSON.stringify(Object.values(products).reduce((acc, product) => {
-  //   acc.push({
-  //     'Название': product.name,
-  //      'Категория': product.category,
-  //      'Количество': product.count,
-  //      'Цена': product.price,
-  //      'Сумма': product.price * product.count,
-  //   })
-  //   return acc;
-  // }, [])))
+
   const categories = categorize(products)
   for (const category in categories) {
     categories[category] = {
