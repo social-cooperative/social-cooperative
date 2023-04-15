@@ -1,10 +1,11 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { useEffect, useState, useCallback } from 'react'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 import { memo } from 'react'
 
 import { auth, firebase, logout } from '../firebase'
 import { timeout, useDispatch } from '../utils'
+import { useSelector } from '../utils'
 
 const ShiedRoot = styled.div`
   height: 100vh;
@@ -50,6 +51,12 @@ const Progress = styled.div`
   }
 `
 
+const FirebaseuiDialogFix = createGlobalStyle`
+  .firebaseui-dialog {
+    top: 0 !important;
+  }
+`
+
 const ShiedLogo = styled.img.attrs(
   () => ({ src: '/logo.svg' })
 )`
@@ -79,51 +86,67 @@ const Delay = ({ ms, children, force = false }) => {
   return (show || force) ? children : null
 }
 
-function AuthShield({ children }) {
-  const [user, setUser] = useState(auth.currentUser || undefined)
-  const [permitted, setPermitted] = useState(false)
+
+export function AuthProvider({ children }) {
   const dispatch = useDispatch()
   useEffect(() => auth.onAuthStateChanged(user => {
     if (user) {
       user.getIdTokenResult().then(({ claims }) => {
         user.getIdTokenResult(true).then(fresh => {
-          setUser(user)
           if (fresh.claims.user_id !== claims.user_id)
             logout()
           if (fresh.claims.user_id) {
             dispatch('set', ['user', user])
             dispatch('set', ['claims', fresh.claims])
-            setPermitted(claims.user_id)
           }
         })
       })
-    } else setUser(null)
+    } else {
+      dispatch('set', ['user', null])
+      dispatch('set', ['claims', {}])
+    }
   }), [])
-  return permitted ? children : (
-    <ShiedRoot>
-      <ShiedInner>
-        <Delay ms={1000} force={user === null}><ShiedLogo /></Delay>
-        {user === undefined
-          ? <Delay ms={1000} force={user === null}><div><Progress /></div></Delay>
-          : (
-            user ? (
-              <div>
-                This user has no access <a href="#" onClick={logout}>Logout</a>
-                <br />
-                <br />Request access for uid
-                <br />{user.uid}
-              </div>
-            ) : (
-              <StyledFirebaseAuth
-                uiConfig={uiConfig}
-                firebaseAuth={firebase.auth()}
-              />
-            )
-          )
-        }
-      </ShiedInner>
-    </ShiedRoot>
-  )
+  return children
+}
+
+export const AuthUIPortable = ({ user }) => (
+  <ShiedInner>
+    <Delay ms={1000} force={user === null}><ShiedLogo /></Delay>
+    {user === undefined
+      ? <Delay ms={1000} force={user === null}><div><Progress /></div></Delay>
+      : (
+        user ? (
+          <div>
+            This user has no access <a href="#" onClick={logout}>Logout</a>
+            <br />
+            <br />Request access for uid
+            <br />{user.uid}
+          </div>
+        ) : (
+          <StyledFirebaseAuth
+            uiConfig={uiConfig}
+            firebaseAuth={firebase.auth()}
+          />
+        )
+      )
+    }
+  </ShiedInner>
+)
+
+export const AuthUI = ({ user }) => (
+  <ShiedRoot>
+    <FirebaseuiDialogFix />
+    <AuthUIPortable user={user} />
+  </ShiedRoot>
+)
+
+const userSelector = ({ user }) => user
+
+export const useUser = () => useSelector(userSelector)
+
+function AuthShield({ children }) {
+  const user = useSelector(userSelector)
+  return user ? children : <AuthUI user={user} />
 }
 
 export default memo(AuthShield)

@@ -199,6 +199,7 @@ import PageTitle from './PageTitle'
 import CurrentProcurement from './CurrentProcurement'
 import { FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
 import FirebaseEditorCheckbox from './FirebaseEditorCheckbox'
+import AuthShield, { AuthUI, useUser } from './AuthShield'
 
 const categorize = (products) =>
   products.reduce(
@@ -211,20 +212,23 @@ const categorize = (products) =>
     {}
   ) as any
 
-export default () => {
+const CartContainer = () => {
   const [products, setProducts] = useState({})
-  useEffect(
-    () =>
-      subscribe(
-        database.ref(`carts/${auth.currentUser.uid}`),
-        'value',
-        (snap) => setProducts(snap.val() || {})
-      ),
-    []
-  )
-
+  useEffect(() => {
+    return subscribe(
+      database.ref(`carts/${auth.currentUser.uid}`),
+      'value',
+      (snap) => setProducts(snap.val() || {})
+    )
+  }, [])
   return <Cart products={products} />
 }
+
+export default () => (
+  <AuthShield>
+    <CartContainer />
+  </AuthShield>
+)
 
 export const Cart = ({ products = {} }) => {
   const [categories, setCategories] = useState({})

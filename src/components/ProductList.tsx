@@ -2,14 +2,24 @@ import styled from 'styled-components'
 
 import { auth, database, storage } from '../firebase'
 import { CellImg } from './Table'
-import { toCurrencyStringRu, useFirebaseValue } from '../utils'
+import { toCurrencyStringRu, useFirebaseValue, useLocalStorageState } from '../utils'
 
-import Accordion from '@mui/material/Accordion'
 import Button from '@mui/material/Button'
 import InfoIcon from '@mui/icons-material/Info'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
+
+
+import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+/*
+const Accordion = 'details'
+const AccordionSummary = 'summary'
+const AccordionDetails = 'div'
+*/
+
+
 
 const Root = styled.div`
   padding: 1em;
@@ -161,6 +171,14 @@ const Root = styled.div`
   }
 `
 
+const GrayLabel = styled.div`
+  background: gray;
+  color: white;
+  text-align: center;
+  padding: 0.2em;
+  margin: 0.2em 0;
+`
+
 const truncate = (str: string | undefined, n: number) => {
   if (!str) return ''
   return str.length <= n ? str : str.substring(0, n + 1) + '...'
@@ -170,9 +188,9 @@ const adminSelector = store => !!store.claims.admin
 
 export const productSlug = model => model.id + '|' + hash(model.name + model.unit + model.price)
 
-export const addToCart = (count, model) => {
+export const addToCart = (count, model, user = auth.currentUser) => {
   const slug = productSlug(model)
-  const cartRef = database.ref(`carts/${auth.currentUser.uid}`)
+  const cartRef = database.ref(`carts/${user.uid}`)
   cartRef.child(slug).get().then(snap => {
     const inCart = snap.val()
     if (inCart) {
@@ -191,9 +209,8 @@ const Product = props => {
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
   const { model, edit, handleOpenCooperateModal, pickedSlots } = props
 
-  const [isDetailsModalOpened, setDetailsModalOpened] = useState(false)
-  const openModal = () => { setDetailsModalOpened(true) }
-  const closeModal = () => { setDetailsModalOpened(false) }
+  const [isDetailsModalOpened, toggleDetailsModalOpened] = useToggle(false)
+  const [isLoginModalOpened, toggleLoginModalOpened] = useToggle(false)
 
   const deleteProduct = useCallback(() => {
     if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`)) {
@@ -202,12 +219,44 @@ const Product = props => {
     }
   }, [model])
 
-  const addToBasket = useCallback(() => addToCart(count, model), [count, model])
+  const user = useUser()
+  const onAddToCart = useCallback(() => {
+    if (user)
+      addToCart(count, model, user)
+    else
+      toggleLoginModalOpened()
+  }, [count, model, user])
+
+  const pasteFromTable = useCallback(() => {
+    navigator.clipboard.readText().then(text => {
+      const cells = text.split('\t')
+      if (cells.length !== 36) {
+        alert('Неправильный формат данных: в строке должно быть ровно 36 столбцов')
+        return
+      }
+      const comment = cells[35] || undefined
+      const name = cells[27]
+      const price = +((cells[28] || '').replace(',', '.'))
+      const unit = cells[23]
+      if (!(cells && name && price && unit)) {
+        alert('Неправильный формат данных: отсутствует цена, наименование или фасовка (число)')
+        return
+      }
+      const weight = cells[22] === 'кг' ? (+((cells[21] || '').replace(',', '.')) || '') : null
+      database.ref(`/products/${model.id}`).update({
+        comment,
+        name,
+        price,
+        unit,
+        weight
+      }).catch(() => { })
+    })
+  }, [model])
 
   const canBuy = !!model.price
 
   return (
-    <article className="product" style={{ background: props.darker ? '#E7F7EB' : undefined }}>
+    <article className="product" style={{ background: props.darker ? 'gray' : undefined, opacity: model.hidden ? 0.4 : 1 }}>
       <div className="product-image">
         <FirebaseImageUploader src={model.image} saveAs={`products/${model.id}`} databasePath={`/products/${model.id}/image`} component={CellImg} enabled={edit} />
       </div>
@@ -226,13 +275,14 @@ const Product = props => {
               </div>
               {(model.description || model.about) &&
                 <div>
-                  <Button onClick={openModal}>
+                  <Button onClick={toggleDetailsModalOpened}>
                     Подробнее
                   </Button>
                 </div>
               }
             </div>
-            <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={closeModal} details={model} />
+            <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={toggleDetailsModalOpened} details={model} />
+            <LoginRequestModal isOpened={isLoginModalOpened} onClose={toggleLoginModalOpened} />
             {model.slotCount && model.slotCount > 1 &&
               <Button onClick={handleOpenCooperateModal} endIcon={<InfoIcon />}>
                 Продукт для кооперации
@@ -255,6 +305,8 @@ const Product = props => {
         }{
           edit &&
           <React.Fragment>
+            {<small style={{ textAlign: 'center', opacity: 0.4 }}>{model.id}</small>}
+            <Button fullWidth onClick={pasteFromTable} variant="outlined" size="small" style={{ margin: '0.3em 0' }}>Вставить из таблицы</Button>
             <div className='product-section'>
               <p className='product-label'>название:</p>
               <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
@@ -315,7 +367,7 @@ const Product = props => {
           </React.Fragment>
         }
       </div>
-      {!edit && <button disabled={!canBuy} className='product-buy' onClick={addToBasket}>В корзину</button>}
+      {!edit && <button disabled={!canBuy} className='product-buy' onClick={onAddToCart}>В корзину</button>}
       {edit && <button className='product-remove' onClick={deleteProduct}>Удалить</button>}
     </article>
   )
@@ -332,6 +384,8 @@ import CurrentProcurement from './CurrentProcurement'
 import ProductDetailsModal from './ProductDetailsModal'
 import CooperateModal from './CooperateModal'
 import { Slots } from './Slots'
+import LoginRequestModal from './LoginRequestModal'
+import { useUser } from './AuthShield'
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
@@ -360,18 +414,19 @@ export const stitchPickedSlotsInCarts = carts => {
   return pickedSlots
 }
 
-export const stitchPickedSlotsInOrders = (orders) => { 
-  if (!orders) return {};
+export const stitchPickedSlotsInOrders = (orders) => {
+  if (!orders) return {}
   return Object.values(orders)
     .flatMap(item => Object.values(item))
-    .flatMap(({products}) => Object.values(products))
-    .reduce((acc, {count, product} /** [{count, product}]*/) => {
-      acc[product.id] = acc[product.id] ? acc[product.id] + count : count;
-      return acc;
-    }, {});
+    .flatMap(({ products }) => Object.values(products))
+    .reduce((acc, { count, product } /** [{count, product}]*/) => {
+      acc[product.id] = acc[product.id] ? acc[product.id] + count : count
+      return acc
+    }, {})
 }
 
-const addProduct = (category?) => () => {
+const addProduct = (category?) => event => {
+  event.stopPropagation()
   if (!category) {
     category = prompt('Введите категорию продукта')
     if (!category) return
@@ -412,17 +467,12 @@ export default () => {
   const pickedSlotsInCarts = useFirebaseValue('carts', {}, stitchPickedSlotsInCarts)
   const pickedSlotsInOrders = useFirebaseValue('orders', {}, stitchPickedSlotsInOrders)
   const pickedSlots = Object.entries(pickedSlotsInOrders).reduce((acc, [id, count]) => {
-    acc[id] = acc[id] ? acc[id] + count : count;
-    return acc;
+    acc[id] = acc[id] ? acc[id] + count : count
+    return acc
   }, pickedSlotsInCarts)
 
-  const [isCooperateModalOpened, setCooperateModalOpened] = useState(false)
-  const openModal = () => {
-    setCooperateModalOpened(true)
-  }
-  const closeModal = () => {
-    setCooperateModalOpened(false)
-  }
+  const [isCooperateModalOpened, toggleCooperateModalOpened] = useToggle(false)
+
 
   const categoryList = (products) => Object.entries<any>(products).reduce((acc, [category, products]) => {
     if (products.some(({ hidden }) => hidden !== true) || edit) {
@@ -437,6 +487,9 @@ export default () => {
     }
     return acc
   }, [])
+
+  const [visibleCategories, setVisibleCategories] =
+    useLocalStorageState('ProductList::visibleCategories', {})
 
   return (
     <Root>
@@ -463,44 +516,47 @@ export default () => {
       </section>
       <section>
         {categoryList(products).map(([category, items]) =>
-          <React.Fragment key={category}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <div className='category'>
-                  <CategoryEditorField
-                    category={category}
-                    products={items}
-                    enabled={edit}
+          <Accordion
+            key={category}
+            expanded={!!visibleCategories[category]}
+            onChange={(_, expanded) => setVisibleCategories(v => ({ ...v, [category]: expanded }))}
+            TransitionProps={{ unmountOnExit: true, timeout: 200 }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <div className='category'>
+                <CategoryEditorField
+                  category={category}
+                  products={items}
+                  enabled={edit}
+                />
+                {edit && (
+                  <button
+                    style={{ float: 'right' }}
+                    onClick={addProduct(category)}
+                  >
+                    ➕
+                  </button>
+                )}
+              </div>
+            </AccordionSummary>
+            <AccordionDetails>
+              <div className='product-list'>
+                {productList(items, edit).map((item) =>
+                  <Product
+                    key={item.id}
+                    model={item}
+                    admin={admin}
+                    edit={edit}
+                    pickedSlots={pickedSlots[item.id]}
+                    handleOpenCooperateModal={toggleCooperateModalOpened}
                   />
-                  {edit && (
-                    <button
-                      style={{ float: 'right' }}
-                      onClick={addProduct(category)}
-                    >
-                      ➕
-                    </button>
-                  )}
-                </div>
-              </AccordionSummary>
-              <AccordionDetails>
-                <div className='product-list'>
-                  {productList(items, edit).map((item) =>
-                    <Product
-                      key={item.id}
-                      model={item}
-                      admin={admin}
-                      edit={edit}
-                      pickedSlots={pickedSlots[item.id]}
-                      handleOpenCooperateModal={openModal}
-                    />
-                  )}
-                </div>
-              </AccordionDetails>
-            </Accordion>
-          </React.Fragment>
+                )}
+              </div>
+            </AccordionDetails>
+          </Accordion>
         )}
       </section>
-      <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
+      <CooperateModal isOpened={isCooperateModalOpened} onClose={toggleCooperateModalOpened} />
     </Root>
   )
 }
