@@ -40,6 +40,10 @@ export const Product = props => {
         </Typography>
       </td><td>
         <Typography>
+          {model.product.weight}
+        </Typography>
+      </td><td>
+        <Typography>
           {model.product.price ? toCurrencyStringRu(model.product.price) : '-'}
         </Typography>
       </td><td>
@@ -191,6 +195,7 @@ export const Orders = ({ orders = {}, ordersHistory = {}, ordersCanceled = {} })
           <tr>
             <td><Typography>Наименование</Typography></td>
             <td><Typography>Ед. изм.</Typography></td>
+            <td><Typography>Вес (кг)</Typography></td>
             <td><Typography>Цена</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>

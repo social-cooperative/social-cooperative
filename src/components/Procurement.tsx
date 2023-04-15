@@ -106,6 +106,7 @@ const ByProductProduct = ({ product, darker }) => (
     <td><Typography>{product.name}</Typography></td>
     <td><Typography>{product.unit}</Typography></td>
     <td><Typography>{product.price}</Typography></td>
+    <td><Typography>{product.weight}</Typography></td>
     <td><Typography>{product.count}</Typography></td>
     <td><Typography>{product.price * product.count}</Typography></td>
   </tr>
@@ -146,56 +147,66 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
   }, [orders])
 
   // TODO: ОТЧЁТЫ
+  console.log('Пономенклатурный отчёт');
+  console.log(JSON.stringify(Object.values(Object.values(orders)
+    .flatMap(item => Object.values(item))
+    .flatMap(({products}) => Object.values(products))
+    .reduce((acc, {count, product} /** [{count, product}]*/) => {
+      if (acc[product.id]) {
+        acc[product.id]['Количество'] += count;
+        acc[product.id]['Сумма'] += count* product.price;
+      } else {
+        acc[product.id] = {
+          'Название': product.name,
+          'Категория': product.category,
+          'Количество': count,
+          'Слоты':  product.slotCount ?? 1, 
+          'Цена': product.price,
+          'Сумма': product.price * count,
+          'Фасовка': `${product.unit} ${product.unitName}`,
+        }
+      }
+      return acc;
+    }, {}))));
 
-  // Пономенклатурный отчёт
-  // console.log(JSON.stringify(Object.values(Object.values(orders)
-  //   .flatMap(item => Object.values(item))
-  //   .flatMap(({products}) => Object.values(products))
-  //   .reduce((acc, {count, product} /** [{count, product}]*/) => {
-  //     if (acc[product.id]) {
-  //       acc[product.id]['Количество'] += count;
-  //       acc[product.id]['Сумма'] += count* product.price;
-  //     } else {
-  //       acc[product.id] = {
-  //         'Название': product.name,
-  //         'Категория': product.category,
-  //         'Количество': count,
-  //         'Слоты':  product.slotCount ?? 1,
-  //         'Цена': product.price,
-  //         'Сумма': product.price * count,
-  //         'Фасовка': `${product.unit} ${product.unitName}`,
-  //       }
-  //     }
-  //     return acc;
-  //   }, {}))));
+  console.log('Позаказный отчёт');
+  console.log(JSON.stringify(generateListFromOrders(orders).sort((a, b) => b.date - a.date).reduce((acc, order, index) => {
+        const weight = Object.values(order.products).reduce((acc: number, {product, count}) => {
+          if (!product.weight) {
+            console.warn(`Для продукта ${product.name} в категории ${product.categoty} не указан вес`);
+          }
+          acc += product.weight ? count * product.weight : 0;
+          return acc;
+        }, 0)
 
-    // Позаказный отчёт
-  // console.log(JSON.stringify(generateListFromOrders(orders).sort((a, b) => b.date - a.date).reduce((acc, order, index) => {
-  //   acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
-  //     accum.push({
-  //       index,
-  //       'Номер': order.phone,
-  //       'Адрес': order.address,
-  //       'Детали заказа': 
-  //       `Заказ от ${toLocaleStringRu(order.date)} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
-  //       + `${order.name}\n`
-  //       + `${order.comment}\n`
-  //       + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''}
-  //          ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`,
-  //       'Название': product.name,
-  //       'Количество': count,
-  //       'Слоты': product.slotsCount,
-  //       'Для замены': forChange ? 'Да' : 'Нет',
-  //       'Для кооперации': forCooperate ? 'Да' : 'Нет',
-  //       'Цена': product.price,
-  //       'Сумма': product.price * count,
-  //       'Категория': product.category,
-  //     })
-  //     return accum;
-  //   }, []))
-  //   return acc;
-  // }, []).flat()))
 
+    acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
+      accum.push({
+        index,
+        'Номер': order.phone,
+        'Адрес': order.address,
+        'Детали заказа': 
+        `Заказ от ${toLocaleStringRu(order.date)} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
+        + `${order.name}\n`
+        + `Вес заказа: ${weight}\n кг`
+        + `${order.comment}\n`
+        + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''}
+           ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`,
+        'Название': product.name,
+        'Количество': count,
+        'Вес': `${product.weight} кг`,
+        'Слоты': product.slotsCount,
+        'Для замены': forChange ? 'Да' : 'Нет',
+        'Для кооперации': forCooperate ? 'Да' : 'Нет',
+        'Цена': product.price,
+        'Сумма': product.price * count,
+        'Категория': product.category,
+      })
+      return accum;
+    }, []))
+    return acc;
+  }, []).flat()))
+    
   return (
     <Root>
       <PageTitle>
@@ -208,6 +219,7 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
             <td><Typography>Наименование</Typography></td>
             <td><Typography>Ед. изм.</Typography></td>
             <td><Typography>Цена</Typography></td>
+            <td><Typography>Вес</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>
           </tr>
@@ -229,7 +241,7 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
                 {historical ? (
                   <Typography variant="h5" align="center"><b>Итого закупка на {toCurrencyStringRu(total)}</b></Typography>
                 ) : (
-                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} disabled>
+                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} >
                     <Typography variant="h5">Закрыть закупку на {toCurrencyStringRu(total)}</Typography>
                   </button>
                 )}
