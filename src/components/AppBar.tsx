@@ -43,13 +43,16 @@ const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
 const CartValue = () => {
   const [cart, setCart] = useState({})
-  useEffect(() => subscribe(
-    database.ref('carts').child(auth.currentUser.uid),
-    'value',
-    snap => setCart(snap.val() || {})
-  ), [])
+  useEffect(() => {
+    if (!auth.currentUser) return
+    subscribe(
+      database.ref('carts').child(auth.currentUser.uid),
+      'value',
+      snap => setCart(snap.val() || {})
+    )
+  }, [auth.currentUser])
   const total = productsTotal(cart)
-  return toCurrencyStringRu(total) as any
+  return total ? toCurrencyStringRu(total) : '' as any
 }
 
 const useProcurement = () => {
@@ -80,11 +83,14 @@ export default () => {
 
   const [ordersCount, setOrdersCount] = useState(0)
 
-  useEffect(() => subscribe(
-    database.ref('orders').child(auth.currentUser.uid),
-    'value',
-    snap => setOrdersCount(snap.numChildren())
-  ), [])
+  useEffect(() => {
+    if (!auth.currentUser) return
+    return subscribe(
+      database.ref('orders').child(auth.currentUser.uid),
+      'value',
+      snap => setOrdersCount(snap.numChildren())
+    )
+  }, [auth.currentUser])
 
   const [procurementTotal, procurementOrderCount] = useProcurement()
 
@@ -94,7 +100,7 @@ export default () => {
     <AppBar position="sticky" color="transparent">
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
-          <div style={{ marginLeft: '1em'}}>
+          <div style={{ marginLeft: '1em' }}>
             <a href="/" >
               <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
             </a>
@@ -108,7 +114,7 @@ export default () => {
             </Typography>
           </A>
 
-          <div style={{ flexGrow: 1}} />
+          <div style={{ flexGrow: 1 }} />
 
           {admin &&
             <A href="/procurement" title="Закупка">
@@ -147,9 +153,11 @@ export default () => {
             }
           </IconButton>
 
-          <IconButton onClick={toggleUserMenuOpen}>
-            <PersonIcon />
-          </IconButton>
+          {!!auth.currentUser &&
+            <IconButton onClick={toggleUserMenuOpen}>
+              <PersonIcon />
+            </IconButton>
+          }
 
         </Stack>
       </AppToolbar>

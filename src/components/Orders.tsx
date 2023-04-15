@@ -10,6 +10,7 @@ import { productsTotal, subscribe, toCurrencyStringRu, toLocaleStringRu } from '
 import PageTitle from './PageTitle'
 import { auth, database } from '../firebase'
 import { Table } from './Table'
+import AuthShield from './AuthShield'
 
 const Root = styled.div`
   padding: 1em;
@@ -57,7 +58,7 @@ export const Product = props => {
 
 const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
 
-export default () => {
+const OrdersContainer = () => {
 
   const [history, setHistory] = useState({})
   useEffect(() => subscribe(
@@ -71,19 +72,6 @@ export default () => {
     'value',
     snap => setHistory(snap.val() || {})
   ), [])
-  const foo = Object.entries(history).reduce((acc, [userId, orders]) => {
-    const orderList = Object.entries(orders).reduce((orderAcc, [orderId, order]) => {
-      if (order.date > 1670911255000 && order.date < 1671033600000) {
-        orderAcc[orderId] = order;
-      }
-      return orderAcc;
-    }, {});
-    if (Object.keys(orderList).length >= 1) {
-      acc[userId] = orderList;
-    }
-    return acc;
-  }, {})
-
 
   const [orders, setOrders] = useState({})
   useEffect(() => subscribe(
@@ -106,6 +94,12 @@ export default () => {
   ), [])
   return <Orders orders={orders} ordersHistory={ordersHistory} ordersCanceled={ordersCanceled} />
 }
+
+export default () => (
+  <AuthShield>
+    <OrdersContainer/>
+  </AuthShield>
+)
 
 export const Order = ({ order, id, cancellable = false, deletable = false, actual = false, withPhone = false }) => {
   const { products, date } = order

@@ -10,7 +10,7 @@ import AppBar from './components/AppBar'
 import UserMenu from './components/UserMenu'
 import Orders from './components/Orders'
 import Procurement from './components/Procurement'
-import AuthShield from './components/AuthShield'
+import {AuthProvider} from './components/AuthShield'
 import MainPage from './components/MainPage'
 import packageInfo from '../package.json'
 
@@ -63,10 +63,6 @@ const CssGlobals = createGlobalStyle`
 
 html {
   font-family: Inter, sans-serif;
-}
-
-.firebaseui-dialog {
-  top: 0 !important;
 }
 `
 
@@ -129,14 +125,14 @@ export default function App() {
         <CssReset />
         <CssGlobals />
         <PathnamesTopLevel>
-          <AuthShield>
+          <AuthProvider>
             <AppBar />
             <UserMenu />
             <div style={{ maxWidth: 960, margin: '0 auto' }}>
               <Pathnames />
               <Version>СоцКооп версия {packageInfo.version}</Version>
             </div>
-          </AuthShield>
+          </AuthProvider>
         </PathnamesTopLevel>
       </ThemeProvider>
     </Provider>

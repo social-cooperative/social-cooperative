@@ -25,7 +25,6 @@ export default ({ src, saveAs = '', databasePath = '', enabled = true, component
   const finalSrc = directSrc ? src : path
 
   useEffect(() => {
-    console.log(src)
     if (src) {
       if (directSrc) {
         setPath(directSrc)

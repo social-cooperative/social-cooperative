@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 import { auth, database, storage } from '../firebase'
 import { CellImg } from './Table'
-import { toCurrencyStringRu, useFirebaseValue } from '../utils'
+import { toCurrencyStringRu, useFirebaseValue, useLocalStorageState } from '../utils'
 
 import Button from '@mui/material/Button'
 import InfoIcon from '@mui/icons-material/Info'
@@ -188,9 +188,9 @@ const adminSelector = store => !!store.claims.admin
 
 export const productSlug = model => model.id + '|' + hash(model.name + model.unit + model.price)
 
-export const addToCart = (count, model) => {
+export const addToCart = (count, model, user = auth.currentUser) => {
   const slug = productSlug(model)
-  const cartRef = database.ref(`carts/${auth.currentUser.uid}`)
+  const cartRef = database.ref(`carts/${user.uid}`)
   cartRef.child(slug).get().then(snap => {
     const inCart = snap.val()
     if (inCart) {
@@ -209,9 +209,8 @@ const Product = props => {
   const [count, setCount, incCount, decCount] = useCounter(1, 1)
   const { model, edit, handleOpenCooperateModal, pickedSlots } = props
 
-  const [isDetailsModalOpened, setDetailsModalOpened] = useState(false)
-  const openModal = () => { setDetailsModalOpened(true) }
-  const closeModal = () => { setDetailsModalOpened(false) }
+  const [isDetailsModalOpened, toggleDetailsModalOpened] = useToggle(false)
+  const [isLoginModalOpened, toggleLoginModalOpened] = useToggle(false)
 
   const deleteProduct = useCallback(() => {
     if (!model.name || confirm(`Вы собираетесь удалить продукт "${model.name}", это действие невозможно отменить.\n\nВы уверены?`)) {
@@ -220,7 +219,13 @@ const Product = props => {
     }
   }, [model])
 
-  const addToBasket = useCallback(() => addToCart(count, model), [count, model])
+  const user = useUser()
+  const onAddToCart = useCallback(() => {
+    if (user)
+      addToCart(count, model, user)
+    else
+      toggleLoginModalOpened()
+  }, [count, model, user])
 
   const pasteFromTable = useCallback(() => {
     navigator.clipboard.readText().then(text => {
@@ -270,13 +275,14 @@ const Product = props => {
               </div>
               {(model.description || model.about) &&
                 <div>
-                  <Button onClick={openModal}>
+                  <Button onClick={toggleDetailsModalOpened}>
                     Подробнее
                   </Button>
                 </div>
               }
             </div>
-            <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={closeModal} details={model} />
+            <ProductDetailsModal isOpened={isDetailsModalOpened} onClose={toggleDetailsModalOpened} details={model} />
+            <LoginRequestModal isOpened={isLoginModalOpened} onClose={toggleLoginModalOpened} />
             {model.slotCount && model.slotCount > 1 &&
               <Button onClick={handleOpenCooperateModal} endIcon={<InfoIcon />}>
                 Продукт для кооперации
@@ -361,7 +367,7 @@ const Product = props => {
           </React.Fragment>
         }
       </div>
-      {!edit && <button disabled={!canBuy} className='product-buy' onClick={addToBasket}>В корзину</button>}
+      {!edit && <button disabled={!canBuy} className='product-buy' onClick={onAddToCart}>В корзину</button>}
       {edit && <button className='product-remove' onClick={deleteProduct}>Удалить</button>}
     </article>
   )
@@ -378,6 +384,8 @@ import CurrentProcurement from './CurrentProcurement'
 import ProductDetailsModal from './ProductDetailsModal'
 import CooperateModal from './CooperateModal'
 import { Slots } from './Slots'
+import LoginRequestModal from './LoginRequestModal'
+import { useUser } from './AuthShield'
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
@@ -463,13 +471,8 @@ export default () => {
     return acc
   }, pickedSlotsInCarts)
 
-  const [isCooperateModalOpened, setCooperateModalOpened] = useState(false)
-  const openModal = () => {
-    setCooperateModalOpened(true)
-  }
-  const closeModal = () => {
-    setCooperateModalOpened(false)
-  }
+  const [isCooperateModalOpened, toggleCooperateModalOpened] = useToggle(false)
+
 
   const categoryList = (products) => Object.entries<any>(products).reduce((acc, [category, products]) => {
     if (products.some(({ hidden }) => hidden !== true) || edit) {
@@ -484,6 +487,9 @@ export default () => {
     }
     return acc
   }, [])
+
+  const [visibleCategories, setVisibleCategories] =
+    useLocalStorageState('ProductList::visibleCategories', {})
 
   return (
     <Root>
@@ -510,7 +516,12 @@ export default () => {
       </section>
       <section>
         {categoryList(products).map(([category, items]) =>
-          <Accordion key={category} TransitionProps={{ unmountOnExit: true, timeout: 200 }}>
+          <Accordion
+            key={category}
+            expanded={!!visibleCategories[category]}
+            onChange={(_, expanded) => setVisibleCategories(v => ({ ...v, [category]: expanded }))}
+            TransitionProps={{ unmountOnExit: true, timeout: 200 }}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <div className='category'>
                 <CategoryEditorField
@@ -537,7 +548,7 @@ export default () => {
                     admin={admin}
                     edit={edit}
                     pickedSlots={pickedSlots[item.id]}
-                    handleOpenCooperateModal={openModal}
+                    handleOpenCooperateModal={toggleCooperateModalOpened}
                   />
                 )}
               </div>
@@ -545,7 +556,7 @@ export default () => {
           </Accordion>
         )}
       </section>
-      <CooperateModal isOpened={isCooperateModalOpened} onClose={closeModal} />
+      <CooperateModal isOpened={isCooperateModalOpened} onClose={toggleCooperateModalOpened} />
     </Root>
   )
 }
