@@ -11,7 +11,7 @@ import UserMenu from './components/UserMenu'
 import Orders from './components/Orders'
 import Procurement from './components/Procurement'
 import {AuthProvider} from './components/AuthShield'
-import MainPage from './components/MainPage'
+import AboutPage from './components/AboutPage'
 import packageInfo from '../package.json'
 
 const CssReset = createGlobalStyle`
@@ -90,7 +90,7 @@ const Pathnames = () => {
   switch (pathname) {
     case 'cart': return <Cart />
     case 'orders': return <Orders />
-    case 'store': return <ProductList />
+    case 'about': return <AboutPage />
     case 'procurement': return admin ? <Procurement {...params} /> : <ProductList />
     default: return <>
       <ProductList />
@@ -99,16 +99,7 @@ const Pathnames = () => {
 
 }
 
-const PathnamesTopLevel = ({ children }) => {
-  const pathname = location.pathname.slice(1)
-  switch (pathname) {
-    case '':
-      return <MainPage />
-    default:
-      return children
-  }
-
-}
+const PathnamesTopLevel = (e) => e.children;
 
 const Version = styled(Typography)`
   color: rgba(128,128,128,0.2);

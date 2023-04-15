@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export default styled.div`
   .main-page {
+    padding: 0 40px;
     font-family: 'Inter', sans-serif;
     color: #3d3d48;
     font-style: normal;
@@ -9,15 +10,8 @@ export default styled.div`
     font-size: 18px;
     line-height: 1.45;
   }
-  .main-page-footer {
-    display: flex;
-    opacity: 0.5;
-    height: 200px;
-    background-color: #ccd;
-    align-items: center;
-    justify-content: center;
-    margin-top: 140px;
-    color: #64646d;
+  .main-page-content {
+    margin-top: 40px;
   }
   .text-white, .preview-container {
     color: white !important;
@@ -108,7 +102,7 @@ export default styled.div`
     background-color: white;
     border: 0;
     border-radius: 4px;
-    color: #239f23;
+    color: #FF6400;
     font-weight: 600;
     font-size: 22px;
     line-height: 17px;
@@ -146,7 +140,7 @@ export default styled.div`
     font-weight: 800;
     font-size: 36px;
     line-height: 44px;
-    color: #239f23;
+    color: #FF6400;
     margin-bottom: 20px;
  }
   .page-section p {

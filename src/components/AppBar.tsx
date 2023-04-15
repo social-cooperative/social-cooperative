@@ -17,7 +17,7 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import PersonIcon from '@mui/icons-material/Person'
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale'
-import StoreIcon from '@mui/icons-material/Store'
+import HelpIcon from '@mui/icons-material/Help'
 
 import Badge from '@mui/material/Badge'
 
@@ -100,17 +100,17 @@ export default () => {
     <AppBar position="sticky" color="transparent">
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
-          <div style={{ marginLeft: '1em' }}>
+          <div style={{ marginLeft: '1em', marginTop: '6px' }}>
             <a href="/" >
-              <img style={{ cursor: 'pointer', height: 37 }} src="logo.svg" />
+              <img style={{ cursor: 'pointer', height: 25 }} src="logo.svg" />
             </a>
           </div>
-          <IconButton href="/catalog" title="Каталог">
-            <StoreIcon />
+          <IconButton href="/about" title="О нас">
+            <HelpIcon />
           </IconButton>
-          <A href="/store" style={{ color: 'rgba(0,0,0,0.54)' }} title="Каталог">
+          <A href="/about" style={{ color: 'rgba(0,0,0,0.54)' }} title="Каталог">
             <Typography>
-              Каталог
+              О нас
             </Typography>
           </A>
 
