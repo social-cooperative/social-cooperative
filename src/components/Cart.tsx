@@ -490,6 +490,7 @@ export const Cart = ({ products = {} }) => {
                       </Typography>
                     )}
                     <button
+                      disabled={checkOrderCreationDisability()}
                       onClick={placeOrder}
                       style={{
                         padding: '1em',
