@@ -1,7 +1,7 @@
 import { CircularProgress } from '@mui/material';
 
 import { locilizeDate, useFirebaseState } from '../../utils';
-import Root from './MainPage.style';
+import Root from './AboutPage.style';
 
 const now = Date.now();
 const previewConfig = {
@@ -10,7 +10,7 @@ const previewConfig = {
   date: null as string | null,
 };
 
-export default function MainPage() {
+export default function AboutPage() {
   const [{ startDate = 0, endDate = 0 }] = useFirebaseState(
     '/currentProcurement',
     {}
@@ -31,26 +31,6 @@ export default function MainPage() {
     <>
       <Root>
         <div className='main-page'>
-          <header className='header'>
-            <img src='/logo.svg' alt='' height='37' />
-          </header>
-          <section className='preview'>
-            {startDate === 0 && (
-              <div className='preview-overlay'>
-                <CircularProgress color='inherit' />
-              </div>
-            )}
-            <div className='preview-container'>
-              <h1 className='preview-heading'>{previewConfig.title}</h1>
-              <p>{previewConfig.subtitle}</p>
-              {previewConfig.date && (
-                <h2 className='preview-subheading'>{previewConfig.date}</h2>
-              )}
-              {procurementIsReady && <a className='preview-button' href='/store'>
-                Каталог
-              </a>}
-            </div>
-          </section>
           <main className='main-page-content'>
             <section className='page-section'>
               <article className='page-section-content'>
@@ -145,31 +125,9 @@ export default function MainPage() {
                 <p>
                   Присоединяйтесь к ближайшей закупке, пишите в наш чат, расскажите о нас вашим друзьям и близким!
                 </p>
-                <p>
-                  Вот наш{' '}
-                  <a href='/store' target='_blank'>
-                    КАТАЛОГ
-                  </a>
-                </p>
               </article>
-              <aside className='page-section-aside'>
-                <article className='qr-item'>
-                  <img
-                    className='qr-item-code'
-                    src='/qr-aside-01.svg'
-                    alt='Информационный телеграм-канал СоцКооп'
-                  />
-                  <p className='qr-item-label'>
-                    Наш телеграм-бот.&nbsp;
-                    <a href='https://t.me/soc_coop_start_bot' target='_blank'>
-                      Прямая ссылка
-                    </a>
-                  </p>
-                </article>
-              </aside>
             </section>
           </main>
-          <footer className='main-page-footer'>ПК "СоцКооп" | 2022</footer>
         </div>
       </Root>
     </>

@@ -18,6 +18,7 @@
     "@valentine-stone/rtdb-requests": "^0.0.14",
     "events": "^3.3.0",
     "firebase": "^8.2.6",
+    "json-to-csv-export": "^2.1.1",
     "lodash": "^4.17.20",
     "qrcode.react": "^3.1.0",
     "react": "^17.0.1",

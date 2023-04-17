@@ -22,9 +22,6 @@ const Root = styled.div`
   padding: 1em;
 `
 
-const productChangedMessage =
-  'Информация об этом продукте была изменена, но за вами сохранено право приобрести то количество которое вы уже добавили в корзину.'
-
 const Product = (props) => {
   const { model } = props
   const total = productsTotal(model)
