@@ -6,9 +6,9 @@ import {QRCodeSVG} from 'qrcode.react';
 const getDetails = ({ total, timestamp, phone }: IPayDetails) => ({
     Name: 'ПК "СОЦКООП"',
     PersonalAcc: '40703810901500002456',
-    BankName: 'ТОЧКА ПАО БАНКА "ФК ОТКРЫТИЕ"',
-    BIC: '044525999',
-    CorrespAcc: '30101810845250000999',
+    BankName: 'ООО "Банк Точка"',
+    BIC: '044525104',
+    CorrespAcc: '30101810745374525104',
     PayeeINN: '9715431330',
     KPP: '771501001',
     Purpose: `Паевой взнос №${timestamp.trim()} @${phone.trim()}. Без НДС`,
