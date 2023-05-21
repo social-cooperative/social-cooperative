@@ -234,7 +234,7 @@ const Product = props => {
         alert('Неправильный формат данных: в строке должно быть ровно 36 столбцов')
         return
       }
-      const comment = cells[35] || undefined
+      const comment = cells[35] || null
       const name = cells[27]
       const price = +((cells[28] || '').replace(',', '.'))
       const unit = cells[23]
