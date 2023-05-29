@@ -13,6 +13,7 @@ import {
   toLocaleStringRu,
   useFirebaseValue,
   useInputState,
+  useSelector,
 } from '../utils'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
@@ -230,6 +231,8 @@ export default () => (
   </AuthShield>
 )
 
+const adminSelector = store => !!store.claims.admin
+
 export const Cart = ({ products = {} }) => {
   const [categories, setCategories] = useState({})
 
@@ -242,8 +245,14 @@ export const Cart = ({ products = {} }) => {
   const wantToChange = Object.values(products).some(
     (model: any) => model.forChange
   )
+  
+  const isAdmin = useSelector(adminSelector);
 
   const checkOrderCreationDisability = (): boolean => {
+    
+    if (isAdmin && cartTotalValid) {
+      return false;
+    }
     // Базовая валидация
     if (
       !(
