@@ -12,6 +12,7 @@ import Orders from './components/Orders'
 import Procurement from './components/Procurement'
 import {AuthProvider} from './components/AuthShield'
 import AboutPage from './components/AboutPage'
+import MemoPage from './components/MemoPage'
 import QRsPage from './components/QRsPage'
 import packageInfo from '../package.json'
 
@@ -93,6 +94,7 @@ const Pathnames = () => {
     case 'orders': return <Orders />
     case 'about': return <AboutPage />
     case 'qrs': return <QRsPage />
+    case 'memo': return <MemoPage />
     case 'procurement': return admin ? <Procurement {...params} /> : <ProductList />
     default: return <>
       <ProductList />

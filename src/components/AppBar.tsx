@@ -110,6 +110,11 @@ export default () => {
               О нас
             </Typography>
           </A>
+          <A href="/memo" style={{ color: 'rgba(0,0,0,0.54)', marginRight: '32px' }} title="Каталог">
+            <Typography>
+              Памятка
+            </Typography>
+          </A>
           <A href="/qrs" style={{ color: 'rgba(0,0,0,0.54)' }} title="Каталог">
             <Typography>
               QR-коды для оплат
