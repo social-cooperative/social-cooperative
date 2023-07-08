@@ -100,17 +100,19 @@ export default () => {
     <AppBar position="sticky" color="transparent">
       <AppToolbar>
         <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }} alignItems="center">
-          <div style={{ marginLeft: '1em', marginTop: '6px' }}>
+          <div style={{ marginLeft: '1em', marginTop: '6px', marginRight: '32px' }}>
             <a href="/" >
               <img style={{ cursor: 'pointer', height: 25 }} src="logo.svg" />
             </a>
           </div>
-          <IconButton href="/about" title="О нас">
-            <HelpIcon />
-          </IconButton>
-          <A href="/about" style={{ color: 'rgba(0,0,0,0.54)' }} title="Каталог">
+          <A href="/about" style={{ color: 'rgba(0,0,0,0.54)', marginRight: '32px' }} title="Каталог">
             <Typography>
               О нас
+            </Typography>
+          </A>
+          <A href="/qrs" style={{ color: 'rgba(0,0,0,0.54)' }} title="Каталог">
+            <Typography>
+              QR-коды для оплат
             </Typography>
           </A>
 

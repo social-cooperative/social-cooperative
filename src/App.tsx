@@ -12,6 +12,7 @@ import Orders from './components/Orders'
 import Procurement from './components/Procurement'
 import {AuthProvider} from './components/AuthShield'
 import AboutPage from './components/AboutPage'
+import QRsPage from './components/QRsPage'
 import packageInfo from '../package.json'
 
 const CssReset = createGlobalStyle`
@@ -91,6 +92,7 @@ const Pathnames = () => {
     case 'cart': return <Cart />
     case 'orders': return <Orders />
     case 'about': return <AboutPage />
+    case 'qrs': return <QRsPage />
     case 'procurement': return admin ? <Procurement {...params} /> : <ProductList />
     default: return <>
       <ProductList />
