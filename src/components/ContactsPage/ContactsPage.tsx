@@ -51,6 +51,11 @@ export default function MemoPage() {
 
               <h4 id="delivery-map" style={{marginBottom: 8}}>Карта доставки</h4><br/>
 
+              <p>
+                Если вы живете дальше — привлекайте друзей и знакомых. Если наберется хотя бы 3 человека в вашей локации, попробуем доставить и вам.
+                Если вы живете на границе зоны, напишите или позвоните нам.
+              </p>
+
               <p style={{position: 'relative', overflow: 'hidden'}}>
                   <iframe src={mapLink} width="100%" height="500" frameborder="1" allowfullscreen="true" style={{position:'relative'}}></iframe>
               </p>

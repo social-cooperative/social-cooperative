@@ -122,7 +122,7 @@ export default () => {
           </A>
           <A href="/contacts" style={{ color: 'rgba(0,0,0,0.54)' }} title="Контакты и карта доставки">
             <Typography>
-              Контакты
+              Контакты и карта доставки
             </Typography>
           </A>
 
