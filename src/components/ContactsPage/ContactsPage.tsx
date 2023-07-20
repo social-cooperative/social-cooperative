@@ -26,10 +26,10 @@ export default function MemoPage() {
 
               <h4 style={{marginBottom: 16}}>Потребительский кооператив «СоцКооп»</h4>
               <div style={{marginBottom: 16}}>
-                <p>ИНН: 9715431330</p>
-                <p>КПП: 771501001</p>
-                <p>ОГРН: 1227700703878</p>
-                <p>ОКПО: 84915489</p>
+                <p style={{marginBottom: 8}}>ИНН: 9715431330</p>
+                <p style={{marginBottom: 8}}>КПП: 771501001</p>
+                <p style={{marginBottom: 8}}>ОГРН: 1227700703878</p>
+                <p style={{marginBottom: 8}}>ОКПО: 84915489</p>
               </div>
 
               <p style={{marginBottom: 16}}>
@@ -43,15 +43,15 @@ export default function MemoPage() {
                 </Button>
               </p>
 
-              <p style={{marginBottom: 16}}>
+              <p style={{marginBottom: 32}}>
                 <Button variant="outlined" startIcon={<WhatsAppIcon />} href='https://wa.me/79911206336' target='_blank'>
                   Наш WhatsApp: +7 (991) 120 63 36
                 </Button>
               </p>
 
-              <h4 id="delivery-map" style={{marginBottom: 8}}>Карта доставки</h4><br/>
+              <h4 id="delivery-map" style={{marginBottom: 8}}>Карта доставки</h4>
 
-              <p>
+              <p style={{marginBottom:16}}>
                 Если вы живете дальше — привлекайте друзей и знакомых. Если наберется хотя бы 3 человека в вашей локации, попробуем доставить и вам.
                 Если вы живете на границе зоны, напишите или позвоните нам.
               </p>
