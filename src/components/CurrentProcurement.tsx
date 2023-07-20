@@ -65,6 +65,9 @@ const CurrentProcurement = ({ edit = false }) => {
       {!activeNow && <Typography variant="h6" style={{marginBottom: '1em'}}>
         Пожалуйста, обратите внимание, что к началу закупки цены в каталоге будут обновлены.
       </Typography>}
+      <Typography variant="h6" style={{marginBottom: '1em'}}>
+        <a href='/contacts#delivery-map' target='_blank'>Карта доставки</a>
+      </Typography>
       {activeNow && <Typography variant="h6" style={{marginBottom: '1em'}}>
         Заказанные продукты будут доставлены вам в воскресенье.
       </Typography>}

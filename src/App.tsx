@@ -13,6 +13,7 @@ import Procurement from './components/Procurement'
 import {AuthProvider} from './components/AuthShield'
 import AboutPage from './components/AboutPage'
 import MemoPage from './components/MemoPage'
+import ContactsPage from './components/ContactsPage'
 import QRsPage from './components/QRsPage'
 import packageInfo from '../package.json'
 
@@ -26,9 +27,6 @@ ul, ol { padding: 0 }
 /* Remove default margin */
 body, h1, h2, h3, h4, p, ul, ol, li, figure,
 figcaption, blockquote, dl, dd { margin: 0 }
-
-/* Make body (and app) like in html 4 */
-body, html, #app { min-height: 100% }
 
 /* Make images easier to work with */
 img { max-width: 100% }
@@ -77,7 +75,7 @@ const theme = createTheme({
   palette: {
     primary: {
       main: '#239F23'
-    },
+    }
   },
 });
 
@@ -95,6 +93,7 @@ const Pathnames = () => {
     case 'about': return <AboutPage />
     case 'qrs': return <QRsPage />
     case 'memo': return <MemoPage />
+    case 'contacts': return <ContactsPage />
     case 'procurement': return admin ? <Procurement {...params} /> : <ProductList />
     default: return <>
       <ProductList />
@@ -105,15 +104,23 @@ const Pathnames = () => {
 
 const PathnamesTopLevel = (e) => e.children;
 
-const Version = styled(Typography)`
-  color: rgba(128,128,128,0.2);
-  font-size: small;
-  text-align: center;
-  margin: 1rem 0 2rem 0;
+const PageContainer = styled.main`
+  max-width: 960px;
+  margin: 0 auto;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+`
+
+const Footer = styled.footer`
+    color: rgba(128,128,128,0.2);
+    font-size: small;
+    text-align: center;
+    margin: auto 0 2rem 0;
+
 `
 
 export default function App() {
-
   return (
     <Provider>
       <ThemeProvider theme={theme}>
@@ -123,10 +130,10 @@ export default function App() {
           <AuthProvider>
             <AppBar />
             <UserMenu />
-            <div style={{ maxWidth: 960, margin: '0 auto' }}>
+            <PageContainer>
               <Pathnames />
-              <Version>СоцКооп версия {packageInfo.version}</Version>
-            </div>
+              <Footer>СоцКооп версия {packageInfo.version}</Footer>
+            </PageContainer>
           </AuthProvider>
         </PathnamesTopLevel>
       </ThemeProvider>
