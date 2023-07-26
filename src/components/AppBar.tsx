@@ -83,14 +83,16 @@ export default () => {
 
   const [ordersCount, setOrdersCount] = useState(0)
 
-  useEffect(() => {
-    if (!auth.currentUser) return
+
+  useEffect(() => auth.onAuthStateChanged(user => {
+    if (!user) return
     return subscribe(
-      database.ref('orders').child(auth.currentUser.uid),
+      database.ref('orders').child(user.uid),
       'value',
       snap => setOrdersCount(snap.numChildren())
     )
-  }, [auth.currentUser])
+  }), [auth.currentUser])
+
 
   const [procurementTotal, procurementOrderCount] = useProcurement()
 
