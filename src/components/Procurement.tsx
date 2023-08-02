@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { productsTotal, subscribe, toCurrencyStringRu, toLocaleStringRu, useSelector, useToggle } from '../utils'
-import { database } from '../firebase'
+import { auth, database } from '../firebase'
 import { Table } from './Table'
 import { Order } from './Orders'
 import PageTitle from './PageTitle'
@@ -145,6 +145,7 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
         acc += product.weight ? count * product.weight : 0;
         return acc;
       }, 0)
+
   
       acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
         accum.push({
@@ -250,7 +251,7 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
                 {historical ? (
                   <Typography variant="h5" align="center"><b>Итого закупка на {toCurrencyStringRu(total)}</b></Typography>
                 ) : (
-                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} disabled>
+                  <button onClick={finishProcurement} style={{ padding: '1em', display: 'block', width: '100%' }} disabled={auth.currentUser.uid !== 'nQnxyUpQ5zY3oIdQB3A5kxTT6BG2'}>
                     <Typography variant="h5">Закрыть закупку на {toCurrencyStringRu(total)}</Typography>
                   </button>
                 )}
