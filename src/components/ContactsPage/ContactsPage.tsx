@@ -33,19 +33,13 @@ export default function MemoPage() {
               </div>
 
               <p style={{marginBottom: 16}}>
-                  Телефон: +7 (991) 120 63 36
+                  Телефон: +7 (495) 241-23-56
               </p>
             
 
               <p style={{marginBottom: 16}}>
                 <Button variant="outlined" startIcon={<TelegramIcon />} color="info" style={{marginRight: 12}} href='https://t.me/SocCoop_Moscow' target='_blank'>
                   Наш телеграм: @SocCoop_Moscow
-                </Button>
-              </p>
-
-              <p style={{marginBottom: 32}}>
-                <Button variant="outlined" startIcon={<WhatsAppIcon />} href='https://wa.me/79911206336' target='_blank'>
-                  Наш WhatsApp: +7 (991) 120 63 36
                 </Button>
               </p>
 
