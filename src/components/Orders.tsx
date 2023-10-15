@@ -147,6 +147,9 @@ export const Order = ({ order, id, cancellable = false, deletable = false, actua
         <Typography variant="h6">
           Заказ от <b>{orderedAt}</b> <b>{withPhone ? order.phone : ''}</b> на сумму <b>{toCurrencyStringRu(total)}</b>
         </Typography>
+        {!!actual && <Typography className='my-2' style={{margin: '8px 0'}}>
+          Для отмены заказа, пожалуйста, напишите в <a href="https://t.me/+mBf0r2he1U43MmQy" target='_blank'>чат пайщиков</a>
+        </Typography>}
         {!!order.name && <Typography align="left">
           {order.name}
         </Typography>}
