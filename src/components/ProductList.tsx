@@ -248,6 +248,7 @@ const Product = props => {
         name,
         price,
         unit,
+        slotCount: unit,
         weight
       }).catch(() => { })
     })
