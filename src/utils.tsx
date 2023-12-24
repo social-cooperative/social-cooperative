@@ -629,3 +629,17 @@ export const resizeImage = (file, max_size, cb) => {
 dayjs.extend(localizedFormat)
 
 export const locilizeDate = (date: number | string | Date) => dayjs(date).locale('ru').format('DD MMMM, dddd, HH:mm');
+
+const dayDeclinationMap = {
+  'вторник': 'во вторник',
+  'среда': 'в среду',
+  'пятница': 'в пятницу',
+  'суббота': 'в субботу',
+}
+
+export const localizeDateExtended = (date: number | string | Date) => {
+  const locale = dayjs(date).locale('ru');
+  const localeDayKey = locale.format('dddd');
+  const localeDay = dayDeclinationMap[localeDayKey] ?? `в ${localeDayKey}`;
+  return `${localeDay}, ${locale.format('DD MMMM')}`
+};

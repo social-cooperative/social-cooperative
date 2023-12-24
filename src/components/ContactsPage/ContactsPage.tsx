@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 import Root from '../AboutPage/AboutPage.style';
-import TelegramIcon from '@mui/icons-material/Telegram';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import mapLink from './mapLink';
-import Button from '@mui/material/Button';
 
 const Section = styled.div`
   display: flex; 
@@ -35,13 +32,6 @@ export default function MemoPage() {
               <p style={{marginBottom: 16}}>
                   Телефон: +7 (495) 241-23-56
               </p>
-            
-
-              <p style={{marginBottom: 16}}>
-                <Button variant="outlined" startIcon={<TelegramIcon />} color="info" style={{marginRight: 12}} href='https://t.me/SocCoop_Moscow' target='_blank'>
-                  Наш телеграм: @SocCoop_Moscow
-                </Button>
-              </p>
 
               <h4 id="delivery-map" style={{marginBottom: 8}}>Карта доставки</h4>
 
@@ -51,7 +41,7 @@ export default function MemoPage() {
               </p>
 
               <p style={{position: 'relative', overflow: 'hidden'}}>
-                  <iframe src={mapLink} width="100%" height="500" frameborder="1" allowfullscreen="true" style={{position:'relative'}}></iframe>
+                  <iframe src={mapLink} width="100%" height="500" style={{position:'relative'}}></iframe>
               </p>
             </Section>
           </main>
