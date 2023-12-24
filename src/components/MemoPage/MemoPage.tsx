@@ -28,7 +28,7 @@ export default function MemoPage() {
                     достаточным объемом товаров по низким ценам надолго;
                   </li>
                   <li>
-                    Минимальная сумма заказа — {toCurrencyStringRu(minCartTotal)} ₽.
+                    Минимальная сумма заказа — {toCurrencyStringRu(minCartTotal)}.
                   </li>
                 </ul>
                 <p>
