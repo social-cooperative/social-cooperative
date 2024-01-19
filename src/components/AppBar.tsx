@@ -1,30 +1,20 @@
 import styled from 'styled-components'
 
-import Paper from '@mui/material/Paper'
-
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
-import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import AppBar from '@mui/material/AppBar'
 import Stack from '@mui/material/Stack'
+import Badge from '@mui/material/Badge'
 
-import LinkIcon from '@mui/icons-material/Link'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
-
-import LogoutIcon from '@mui/icons-material/Logout'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import PersonIcon from '@mui/icons-material/Person'
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale'
-import HelpIcon from '@mui/icons-material/Help'
 
-import Badge from '@mui/material/Badge'
-
-import { log, productsTotal, subscribe, toCurrencyStringRu, useSelector } from '../utils'
-import { auth, database, logoutAndReload } from '../firebase'
+import { productsTotal, subscribe, toCurrencyStringRu, useSelector } from '../utils'
+import { auth, database } from '../firebase'
 import { useEffect, useState } from 'react'
-import { useTheme } from '@mui/material/styles'
 
 const AppToolbar = styled(Toolbar)`
   top: 0;
@@ -36,24 +26,7 @@ const A = styled.a`
   color: inherit;
 `
 
-
 const adminSelector = store => !!store.claims.admin
-
-const ru = new Intl.NumberFormat("ru", { style: "currency", currency: "RUB" })
-
-const CartValue = () => {
-  const [cart, setCart] = useState({})
-  useEffect(() => {
-    if (!auth.currentUser) return
-    subscribe(
-      database.ref('carts').child(auth.currentUser.uid),
-      'value',
-      snap => setCart(snap.val() || {})
-    )
-  }, [auth.currentUser])
-  const total = productsTotal(cart)
-  return total ? toCurrencyStringRu(total) : '' as any
-}
 
 const useProcurement = () => {
   const [orders, setOrders] = useState({})
@@ -89,10 +62,24 @@ export default () => {
     return subscribe(
       database.ref('orders').child(user.uid),
       'value',
-      snap => setOrdersCount(snap.numChildren())
+      snap => {
+        setOrdersCount(snap.numChildren())
+      }
     )
   }), [auth.currentUser])
 
+  const [cart, setCart] = useState(null)
+  useEffect(() => auth.onAuthStateChanged(user => {
+    if (!user) return
+    subscribe(
+      database.ref('carts').child(auth.currentUser.uid),
+      'value',
+      snap => {
+        const total = productsTotal(snap.val());
+        setCart(total ? toCurrencyStringRu(total) : '' as any)
+      }
+    )
+  }), [auth.currentUser])
 
   const [procurementTotal, procurementOrderCount] = useProcurement()
 
@@ -151,7 +138,7 @@ export default () => {
 
           <A href="/cart" style={{ color: 'rgba(0,0,0,0.54)' }} title="Корзина">
             <Typography>
-              <CartValue />
+              {cart}
             </Typography>
           </A>
           <IconButton href="/cart" title="Корзина">
