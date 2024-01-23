@@ -4,6 +4,7 @@ import Root from '../AboutPage/AboutPage.style';
 export default function MemoPage() {
 
   const [{ minCartTotal }] = useFirebaseState('/currentProcurement', {})
+  console.log(minCartTotal);
 
   return (
     <>
@@ -28,7 +29,7 @@ export default function MemoPage() {
                     достаточным объемом товаров по низким ценам надолго;
                   </li>
                   <li>
-                    Минимальная сумма заказа — {toCurrencyStringRu(minCartTotal)}.
+                    Минимальная сумма заказа — 3 000 ₽.
                   </li>
                 </ul>
                 <p>
