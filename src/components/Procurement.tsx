@@ -228,8 +228,8 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
           <tr>
             <td><Typography>Наименование</Typography></td>
             <td><Typography>Ед. изм.</Typography></td>
-            <td><Typography>Цена</Typography></td>
             <td><Typography>Вес</Typography></td>
+            <td><Typography>Цена</Typography></td>
             <td><Typography>Кол-во</Typography></td>
             <td><Typography>Стоимость</Typography></td>
           </tr>
