@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography'
+import MaterialButton from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import styled from 'styled-components'
 
@@ -7,7 +8,6 @@ import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
 import { addToCart, productSlug } from './ProductList'
 import {
-  log,
   productsTotal,
   toCurrencyStringRu,
   toLocaleStringRu,
@@ -200,7 +200,7 @@ import PageTitle from './PageTitle'
 import CurrentProcurement from './CurrentProcurement'
 import { FormControlLabel, IconButton, Radio, RadioGroup } from '@mui/material'
 import FirebaseEditorCheckbox from './FirebaseEditorCheckbox'
-import AuthShield, { AuthUI, useUser } from './AuthShield'
+import AuthShield from './AuthShield'
 
 const categorize = (products) =>
   products.reduce(
@@ -231,7 +231,11 @@ export default () => (
   </AuthShield>
 )
 
-const adminSelector = store => !!store.claims.admin
+const adminSelector = store => !!store.claims.admin;
+
+const ValidationTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} componentsProps={{ tooltip: { className: className } }} />
+))({fontSize: '18px', fontWeight: '300', maxWidth: 500});
 
 export const Cart = ({ products = {} }) => {
   const [categories, setCategories] = useState({})
@@ -248,29 +252,43 @@ export const Cart = ({ products = {} }) => {
   
   const isAdmin = useSelector(adminSelector);
 
-  const checkOrderCreationDisability = (): boolean => {
-    
+  const getValidatonMessage = (): string | null => {
     if (isAdmin && cartTotalValid) {
-      return false;
-    }
-    // Базовая валидация
-    if (
-      !(
-        name &&
-        address &&
-        cartTotalValid &&
-        activeNow &&
-        !frozenProductsList.length
-      )
-    ) {
-      return true
+      return null;
     }
 
-    // Если человек хочет заменить продукт, если что, но не оставил инфу
-    // на случай, если мы ему не дозвонимся
-    if (wantToChange && isRemoveIfNotCalled === null) {
-      return true
+    if (!activeNow) {
+      return `
+        Невозможно сделать заказ, так как закупка неактивна. 
+        Даты ближайшей закупки указаны чуть выше.
+      `
     }
+
+    if (frozenProductsList.length) {
+      return `
+        В вашей корзине есть устаревшие продукты. Пожалуйста, замените или удалите их.
+      `
+    }
+
+    if (!cartTotalValid) {
+      return `
+        Не набрана минимальная сумма заказа: ${toCurrencyStringRu(minCartTotal)}.
+      `
+    }
+
+    if (!name || !address) {
+      return `
+        Не заполнены обязательные поля — ФИО и/или адрес.
+      `
+    }
+
+    if (wantToChange && isRemoveIfNotCalled === null) {
+      return `
+        Не указана информация о том, что делать с товарами, если мы вам не дозвонимся.
+      `
+    }
+
+    return null;
   }
 
   const handleChangeRemoveIfNotCalledOption = ({ target }) => {
@@ -498,17 +516,27 @@ export const Cart = ({ products = {} }) => {
                         ))}
                       </Typography>
                     )}
-                    <button
-                      disabled={checkOrderCreationDisability()}
-                      onClick={placeOrder}
-                      style={{
-                        padding: '1em',
-                        display: 'block',
-                        width: '100%',
-                      }}
+                    <ValidationTooltip 
+                      title={getValidatonMessage()} 
+                      arrow
+                      placement="top"
                     >
-                      Внести пай на сумму {toCurrencyStringRu(total)}
-                    </button>
+                      <span>
+                        <MaterialButton
+                          disabled={!!getValidatonMessage()}
+                          variant="contained"
+                          onClick={placeOrder}
+                          style={{
+                            padding: '1em',
+                            display: 'block',
+                            fontSize: '22px',
+                            width: '100%',
+                          }}
+                        >
+                          Внести пай на сумму {toCurrencyStringRu(total)}
+                        </MaterialButton>
+                      </span>
+                    </ValidationTooltip>
                     <Typography style={{ marginTop: '1em' }}>
                       * Если вы покупаете у нас в первый раз, вам понадобится
                       подписать заявление на вступление в наш кооператив и
