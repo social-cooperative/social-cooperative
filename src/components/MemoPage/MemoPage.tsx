@@ -4,7 +4,6 @@ import Root from '../AboutPage/AboutPage.style';
 export default function MemoPage() {
 
   const [{ minCartTotal }] = useFirebaseState('/currentProcurement', {})
-  console.log(minCartTotal);
 
   return (
     <>

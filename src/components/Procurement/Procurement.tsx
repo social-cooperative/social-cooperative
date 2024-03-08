@@ -1,15 +1,17 @@
 import Typography from '@mui/material/Typography'
 import styled from 'styled-components'
 import React, { useCallback, useEffect, useState } from 'react'
-
-import { productsTotal, subscribe, toCurrencyStringRu, toLocaleStringRu, useSelector, useToggle } from '../utils'
-import { auth, database } from '../firebase'
-import { Table } from './Table'
-import { Order } from './Orders'
-import PageTitle from './PageTitle'
-import { categorize } from './ProductList'
 import { Button } from '@mui/material'
-import csvDownload from 'json-to-csv-export'
+
+import { productsTotal, subscribe, toCurrencyStringRu, useSelector, useToggle } from '../../utils'
+import { auth, database } from '../../firebase'
+import { Table } from '../Table'
+import { Order } from '../Orders'
+import PageTitle from '../PageTitle'
+import { categorize } from '../ProductList'
+import { downloadReportByOrders } from './downloadReportByOrders'
+import { downloadReportByProducts } from './downloadReportByProducts'
+import { logReportInXML } from './logReportInXML'
 
 const Root = styled.div`
   padding: 1em;
@@ -136,82 +138,10 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
     }))
   }, [orders])
 
-  const downloadReportByOrders = () => {
-    const data  = generateListFromOrders(orders).sort((a, b) => b.date - a.date).reduce((acc, order, index) => {
-      const weight = Object.values(order.products).reduce((acc: number, {product, count}) => {
-        if (!product.weight) {
-          console.warn(`Для продукта ${product.name} в категории ${product.categoty} не указан вес`);
-        }
-        acc += product.weight ? count * product.weight : 0;
-        return acc;
-      }, 0)
+  const handleRepostByOrders = () => downloadReportByOrders(orders);
+  const handleReportByProducts = () => downloadReportByProducts(orders);
+  const handleLogReportInXML = () => logReportInXML(orders);
 
-  
-      acc.push(Object.values(order.products).reduce((accum, {count, product, forChange, forCooperate}) => {
-        accum.push({
-          index,
-          'Номер': order.phone,
-          'Адрес': order.address,
-          'Детали заказа': 
-          `Заказ от ${toLocaleStringRu(order.date)} ${toCurrencyStringRu(productsTotal(order.products))}\n\n`
-          + `${order.name}\n`
-          + `Вес заказа: ${weight}\n кг`
-          + `${order.comment}\n`
-          + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''}
-            ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`,
-          'Название': product.name,
-          'Количество': count,
-          'Вес': `${product.weight} кг`,
-          'Слоты': product.slotsCount,
-          'Для замены': forChange ? 'Да' : 'Нет',
-          'Для кооперации': forCooperate ? 'Да' : 'Нет',
-          'Цена': product.price,
-          'Сумма': product.price * count,
-          'Категория': product.category,
-        })
-        return accum;
-      }, []))
-      return acc;
-    }, []).flat()
-    const dataToConvert = {
-      data,
-      filename: 'Позаказный отчёт',
-      delimiter: ',',
-      headers: ['Номер', "Адрес", "Детали заказа", "Название", "Количество", "Вес", "Слоты", "Для замены", "Для кооперации", "Цена", "Сумма", "Категория"]
-    }
-    csvDownload(dataToConvert);
-  }
-
-  const downloadReportByProducts = () => {
-    const data = Object.values(Object.values(orders)
-      .flatMap(item => Object.values(item))
-      .flatMap(({products}) => Object.values(products))
-      .reduce((acc, {count, product} /** [{count, product}]*/) => {
-        if (acc[product.id]) {
-          acc[product.id]['Количество'] += count;
-          acc[product.id]['Сумма'] += count* product.price;
-        } else {
-          acc[product.id] = {
-            'Название': product.name,
-            'Категория': product.category,
-            'Количество': count,
-            'Слоты':  product.slotCount ?? 1, 
-            'Цена': product.price,
-            'Сумма': product.price * count,
-            'Фасовка': `${product.unit} ${product.unitName}`,
-          }
-        }
-        return acc;
-      }, {}));
-
-    const dataToConvert = {
-      data,
-      filename: 'Пономенклатурный отчёт',
-      delimiter: ',',
-      headers: ["Название", "Категория", "Количество", "Слоты", "Цена", "Сумма", "Фасовка"]
-    }
-    csvDownload(dataToConvert);
-  }
 
   return (
     <Root>
@@ -220,8 +150,9 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
         <Button style={{ float: 'right' }} onClick={toggleByProducts}>{byProducts ? 'По клиентам' : 'По продуктам'}</Button>
       </PageTitle>
       <div>
-        <Button onClick={downloadReportByOrders}>Позаказный отчёт</Button>
-        <Button onClick={downloadReportByProducts}>Пономенклатурный отчёт</Button>
+        <Button onClick={handleRepostByOrders}>Позаказный отчёт</Button>
+        <Button onClick={handleReportByProducts}>Пономенклатурный отчёт</Button>
+        <Button onClick={handleLogReportInXML}>XML-отчёт в консоль</Button>
       </div>
       <Table>
         <thead>
