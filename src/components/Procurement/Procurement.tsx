@@ -1,8 +1,12 @@
 import Typography from '@mui/material/Typography'
 import styled from 'styled-components'
-import React, { useCallback, useEffect, useState } from 'react'
-import { Button } from '@mui/material'
+import React, { Fragment, useCallback, useEffect, useState } from 'react'
+import { Alert, Button } from '@mui/material'
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
+import DateTimePicker from '../DateTimePicker'
 import { productsTotal, subscribe, toCurrencyStringRu, useSelector, useToggle } from '../../utils'
 import { auth, database } from '../../firebase'
 import { Table } from '../Table'
@@ -47,7 +51,7 @@ const useProcurement = ({ historical, start, end }) => {
         }
       setOrders(val)
     }
-  ), [])
+  ), [start, end])
   let total = 0
   let count = 0
   for (const id in orders)
@@ -61,11 +65,7 @@ const useProcurement = ({ historical, start, end }) => {
 export default props => {
   const admin = useSelector(adminSelector)
   return admin && (
-    <Orders
-      historical={props.historical === ''}
-      start={props.start ? +props.start : 0}
-      end={props.end ? +props.end : Infinity}
-    />
+    <Orders />
   )
 }
 
@@ -124,9 +124,23 @@ const ByProducts = ({ orders }) => {
   }</>
 }
 
-export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
+export const Orders = () => {
   const [byProducts, toggleByProducts] = useToggle(false)
-  const [total, count, orders] = useProcurement({ historical, start, end })
+
+  const [historical, setHistoricalValue] = React.useState(false);
+  const [historicalStartDate, setHistoricalStartDate] = React.useState(null);
+  const [historicalEndDate, setHistoricalEndDate] = React.useState(null);
+
+  const handleHistoricalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const eventValue = (event.target as HTMLInputElement).value;
+    setHistoricalValue(eventValue === 'true' ? true : false);
+    if (!historical) {
+      setHistoricalStartDate(null);
+      setHistoricalEndDate(null);
+    }
+  };
+
+  const [total, count, orders] = useProcurement({ historical, start: historicalStartDate ?? 0, end: historicalEndDate ?? Infinity})
   const finishProcurement = useCallback(() => {
     const procured = Date.now()
     Promise.all(Object.entries<any>(orders).map(([uid, order]) => {
@@ -149,7 +163,27 @@ export const Orders = ({ historical = false, start = 0, end = Infinity }) => {
         Закупка
         <Button style={{ float: 'right' }} onClick={toggleByProducts}>{byProducts ? 'По клиентам' : 'По продуктам'}</Button>
       </PageTitle>
-      <div>
+      <Typography variant='h6' style={{marginBottom: '16px'}}>Диапазон просмотра</Typography>
+      <RadioGroup
+        row
+        aria-labelledby="demo-row-radio-buttons-group-label"
+        name="row-radio-buttons-group"
+        value={historical}
+        onChange={handleHistoricalChange}
+        style={{marginBottom: '16px'}}
+      >
+        <FormControlLabel value={false} control={<Radio />} label="Текущая закупка" />
+        <FormControlLabel value={true} control={<Radio />} label="Задать период выборки" />
+      </RadioGroup>
+
+      {historical &&
+        <React.Fragment>
+          <Alert severity="warning" style={{marginBottom: '16px'}}>Внимание: если последняя закупка не закрыта, то она не попадёт в выборку</Alert>
+          <DateTimePicker value={historicalStartDate} onChange={setHistoricalStartDate} label="Начало выборки" />
+          <DateTimePicker value={historicalEndDate} onChange={setHistoricalEndDate} label="Конец выборки" />
+        </React.Fragment>
+      }
+      <div style={{marginTop: '16px'}}>
         <Button onClick={handleRepostByOrders}>Позаказный отчёт</Button>
         <Button onClick={handleReportByProducts}>Пономенклатурный отчёт</Button>
         <Button onClick={handleLogReportInXML}>XML-отчёт в консоль</Button>
