@@ -10,6 +10,7 @@ export const downloadReportByProducts = (orders: any) => {
           acc[product.id]['Сумма'] += count* product.price;
         } else {
           acc[product.id] = {
+            'ID_Номенклатуры': product.id,
             'Название': product.name,
             'Категория': product.category,
             'Количество': count,
@@ -26,7 +27,7 @@ export const downloadReportByProducts = (orders: any) => {
       data,
       filename: 'Пономенклатурный отчёт',
       delimiter: ',',
-      headers: ["Название", "Категория", "Количество", "Слоты", "Цена", "Сумма", "Фасовка"]
+      headers: ['ID_Номенклатуры', "Название", "Категория", "Количество", "Слоты", "Цена", "Сумма", "Фасовка"]
     }
     csvDownload(dataToConvert);
   }

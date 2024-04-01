@@ -23,6 +23,7 @@ export const downloadReportByOrders = (orders: any) => {
       acc.push(Object.values(order.products).reduce((accum: any, {count, product, forChange, forCooperate}) => {
         accum.push({
           index,
+          'ID_Номенклатуры': product.id,
           'Номер': order.phone,
           'Адрес': order.address,
           'Детали заказа': 
@@ -50,7 +51,7 @@ export const downloadReportByOrders = (orders: any) => {
       data,
       filename: 'Позаказный отчёт',
       delimiter: ',',
-      headers: ['Номер', "Адрес", "Детали заказа", "Название", "Количество", "Вес", "Слоты", "Для замены", "Для кооперации", "Цена", "Сумма", "Категория"]
+      headers: ['ID_Номенклатуры', 'Номер', "Адрес", "Детали заказа", "Название", "Количество", "Вес", "Слоты", "Для замены", "Для кооперации", "Цена", "Сумма", "Категория"]
     }
     csvDownload(dataToConvert);
   }
