@@ -37,6 +37,7 @@ export const downloadReportByOrders = (orders: any) => {
           'Количество': count,
           'Вес': `${product.weight} кг`,
           'Слоты': product.slotsCount,
+          'Фасовка': `${product.unit} ${product.unitName}`,
           'Для замены': forChange ? 'Да' : 'Нет',
           'Для кооперации': forCooperate ? 'Да' : 'Нет',
           'Цена': product.price,
@@ -51,7 +52,23 @@ export const downloadReportByOrders = (orders: any) => {
       data,
       filename: 'Позаказный отчёт',
       delimiter: ',',
-      headers: ['ID_Номенклатуры', 'Номер', "Адрес", "Детали заказа", "Название", "Количество", "Вес", "Слоты", "Для замены", "Для кооперации", "Цена", "Сумма", "Категория"]
+      headers: [
+        'Индекс заказа',
+        'ID_Номенклатуры', 
+        'Номер', 
+        "Адрес", 
+        "Детали заказа", 
+        "Название", 
+        "Количество", 
+        "Вес", 
+        "Слоты", 
+        'Фасовка', 
+        "Для замены", 
+        "Для кооперации", 
+        "Цена", 
+        "Сумма", 
+        "Категория"
+      ]
     }
     csvDownload(dataToConvert);
   }
