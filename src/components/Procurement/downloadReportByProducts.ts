@@ -17,6 +17,7 @@ export const downloadReportByProducts = (orders: any) => {
             'Цена': product.price,
             'Сумма': product.price * count,
             'Фасовка': `${product.unit} ${product.unitName}`,
+            'Поставщик': `${product.supplier ?? 'Не указан'}`,
             // 'Слоты':  product.slotCount ?? 1, 
           }
         }
@@ -34,7 +35,8 @@ export const downloadReportByProducts = (orders: any) => {
         "Количество", 
         "Цена", 
         "Сумма", 
-        "Фасовка"
+        "Фасовка",
+        "Поставщик",
         // "Слоты", 
       ]
     }

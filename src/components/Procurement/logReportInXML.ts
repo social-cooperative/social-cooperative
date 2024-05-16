@@ -18,6 +18,7 @@ export const logReportInXML = (orders: any) => {
                             'Цена': t(product.price),
                             'Кратко_о_продукте': t(product.about ?? null),
                             'Комментарий_к_продукту': t(product.comment ?? null),
+                            'Поставщик': t(product.supplier ?? null),
                             'Описание_к_продукту': t(product.description ?? null),
                             'Количество_слотов_кооперации': t(product.slotCount ?? null),
                             'Единица_измерения': t(product.unitName ?? null),

@@ -313,6 +313,10 @@ const Product = props => {
               <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
             </div>
             <div className='product-section'>
+              <p className='product-label'>поставщик:</p>
+              <FirebaseEditorField path={`/products/${model.id}/supplier`} value={model.supplier} enabled={edit} />
+            </div>
+            <div className='product-section'>
               <p className='product-label'>комментарий (будет снаружи карточки):</p>
               <FirebaseEditorField path={`/products/${model.id}/comment`} value={model.comment} enabled={edit} />
             </div>
