@@ -11,13 +11,13 @@ export const downloadReportByProducts = (orders: any) => {
         } else {
           acc[product.id] = {
             'ID_Номенклатуры': product.id,
-            'Название': product.name,
             'Категория': product.category,
+            'Название': product.name,
             'Количество': count,
-            'Слоты':  product.slotCount ?? 1, 
             'Цена': product.price,
             'Сумма': product.price * count,
             'Фасовка': `${product.unit} ${product.unitName}`,
+            // 'Слоты':  product.slotCount ?? 1, 
           }
         }
         return acc;
@@ -27,7 +27,16 @@ export const downloadReportByProducts = (orders: any) => {
       data,
       filename: 'Пономенклатурный отчёт',
       delimiter: ',',
-      headers: ['ID_Номенклатуры', "Название", "Категория", "Количество", "Слоты", "Цена", "Сумма", "Фасовка"]
+      headers: [
+        'ID_Номенклатуры', 
+        "Категория", 
+        "Название", 
+        "Количество", 
+        "Цена", 
+        "Сумма", 
+        "Фасовка"
+        // "Слоты", 
+      ]
     }
     csvDownload(dataToConvert);
   }
