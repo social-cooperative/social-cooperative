@@ -23,7 +23,6 @@ export const downloadReportByOrders = (orders: any) => {
       acc.push(Object.values(order.products).reduce((accum: any, {count, product, forChange, forCooperate}) => {
         accum.push({
           index,
-          'ID_Номенклатуры': product.id,
           'Номер': order.phone,
           'Адрес': order.address,
           'Детали заказа': 
@@ -32,17 +31,18 @@ export const downloadReportByOrders = (orders: any) => {
           + `Вес заказа: ${weight}\n кг`
           + `${order.comment}\n`
           + `${order.wantToChange ? 'Есть продукты с заменой, в случае недозвона' : ''}
-            ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`,
+          ${order.wantToChange ? (order.isRemoveIfNotCalled ? 'удалить их\n\n' : 'заменить их\n\n') : ''}`,
+          'ID_Номенклатуры': product.id,
+          'Категория': product.category,
           'Название': product.name,
           'Количество': count,
-          'Вес': `${product.weight} кг`,
-          // 'Слоты': product.slotsCount,
-          'Фасовка': `${product.unit} ${product.unitName}`,
-          // 'Для замены': forChange ? 'Да' : 'Нет',
-          // 'Для кооперации': forCooperate ? 'Да' : 'Нет',
           'Цена': product.price,
           'Сумма': product.price * count,
-          'Категория': product.category,
+          'Фасовка': `${product.unit} ${product.unitName}`,
+          'Вес': `${product.weight} кг`,
+          // 'Слоты': product.slotsCount,
+          // 'Для замены': forChange ? 'Да' : 'Нет',
+          // 'Для кооперации': forCooperate ? 'Да' : 'Нет',
         })
         return accum;
       }, []))
@@ -54,20 +54,20 @@ export const downloadReportByOrders = (orders: any) => {
       delimiter: ',',
       headers: [
         'Индекс заказа',
-        'ID_Номенклатуры', 
         'Номер', 
         "Адрес", 
         "Детали заказа", 
+        'ID_Номенклатуры', 
+        "Категория",
         "Название", 
         "Количество", 
-        "Вес", 
-        // "Слоты", 
-        'Фасовка', 
-        // "Для замены", 
-        // "Для кооперации", 
         "Цена", 
         "Сумма", 
-        "Категория"
+        'Фасовка', 
+        "Вес", 
+        // "Слоты", 
+        // "Для замены", 
+        // "Для кооперации", 
       ]
     }
     csvDownload(dataToConvert);
