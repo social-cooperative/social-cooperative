@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import QRModal from './QRModal'
 import { firebase, auth, database } from '../firebase'
 import { Table, CellImg } from './Table'
-import { addToCart, productSlug } from './ProductList'
+import { addToCart, productSlug } from './ProductList/ProductList'
 import {
   productsTotal,
   toCurrencyStringRu,

@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
-import { auth, database, storage } from '../firebase'
-import { CellImg } from './Table'
-import { toCurrencyStringRu, useFirebaseValue, useLocalStorageState } from '../utils'
+import { auth, database, storage } from '../../firebase'
+import { CellImg } from '../Table'
+import { toCurrencyStringRu, useFirebaseValue, useLocalStorageState } from '../../utils'
 
 import Button from '@mui/material/Button'
 import InfoIcon from '@mui/icons-material/Info'
@@ -309,6 +309,10 @@ const Product = props => {
             {<small style={{ textAlign: 'center', opacity: 0.4 }}>{model.id}</small>}
             <Button fullWidth onClick={pasteFromTable} variant="outlined" size="small" style={{ margin: '0.3em 0' }}>Вставить из таблицы</Button>
             <div className='product-section'>
+              <p className='product-label'>Коэффициент</p>
+              <FirebaseEditorField path={`/products/${model.id}/coefficient`} value={model.coefficient} enabled={edit} />
+            </div>
+            <div className='product-section'>
               <p className='product-label'>название:</p>
               <FirebaseEditorField path={`/products/${model.id}/name`} value={model.name} enabled={edit} />
             </div>
@@ -378,19 +382,20 @@ const Product = props => {
   )
 }
 
-import { hash, log, subscribe, useCounter, useSelector, useToggle } from '../utils'
+import { hash, log, subscribe, useCounter, useSelector, useToggle } from '../../utils'
 import React, { useCallback, useEffect, useState } from 'react'
-import FirebaseEditorField from './FirebaseEditorField'
-import FirebaseEditorCheckbox from './FirebaseEditorCheckbox'
-import FirebaseImageUploader from './FirebaseImageUploader'
-import PageTitle from './PageTitle'
-import EditorField from './EditorField'
-import CurrentProcurement from './CurrentProcurement'
-import ProductDetailsModal from './ProductDetailsModal'
-import CooperateModal from './CooperateModal'
-import { Slots } from './Slots'
-import LoginRequestModal from './LoginRequestModal'
-import { useUser } from './AuthShield'
+import FirebaseEditorField from '../FirebaseEditorField'
+import FirebaseEditorCheckbox from '../FirebaseEditorCheckbox'
+import FirebaseImageUploader from '../FirebaseImageUploader'
+import PageTitle from '../PageTitle'
+import EditorField from '../EditorField'
+import CurrentProcurement from '../CurrentProcurement'
+import ProductDetailsModal from '../ProductDetailsModal'
+import CooperateModal from '../CooperateModal'
+import { Slots } from '../Slots'
+import LoginRequestModal from '../LoginRequestModal'
+import { useUser } from '../AuthShield'
+import { downloadReportByPosition } from './downloadReportByPosition'
 
 const CategoryEditorField = ({ category, products, ...rest }) => {
   const save = useCallback(name => {
@@ -469,6 +474,7 @@ export default () => {
   const admin = useSelector(adminSelector)
   const [edit, toggleEdit] = useToggle(false)
   const products = useFirebaseValue('products', [], categorize)
+  const rawProducts = useFirebaseValue('products', [])
   const pickedSlotsInCarts = useFirebaseValue('carts', {}, stitchPickedSlotsInCarts)
   const pickedSlotsInOrders = useFirebaseValue('orders', {}, stitchPickedSlotsInOrders)
   const pickedSlots = Object.entries(pickedSlotsInOrders).reduce((acc, [id, count]) => {
@@ -496,15 +502,19 @@ export default () => {
   const [visibleCategories, setVisibleCategories] =
     useLocalStorageState('ProductList::visibleCategories', {})
 
+  const handleReportByPosition = () => downloadReportByPosition(rawProducts);
+
   return (
     <Root>
       <PageTitle>
         Каталог
+
         {admin && (
           <button style={{ float: 'right' }} onClick={toggleEdit}>
             {edit ? '💾' : '✏️'}
           </button>
         )}
+
         {edit && (
           <button style={{ float: 'right' }} onClick={overwriteProducts}>
             🗃️
@@ -519,6 +529,10 @@ export default () => {
       <section>
         <CurrentProcurement edit={edit} />
       </section>
+      
+      {admin && (
+          <Button onClick={handleReportByPosition}>Скачать номенклатуру в CSV</Button>
+        )}
       <section>
         {categoryList(products).map(([category, items]) =>
           <Accordion
