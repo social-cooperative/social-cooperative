@@ -1,4 +1,6 @@
-import { CircularProgress } from '@mui/material';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import IconButton from '@mui/material/IconButton'
 
 import { locilizeDate, useFirebaseState } from '../../utils';
 import Root from './AboutPage.style';
@@ -35,6 +37,12 @@ export default function AboutPage() {
             <section className='page-section'>
               <article className='page-section-content'>
                 <h2>Что такое СоцКооп</h2>
+                <IconButton href="/Устав_ПК_СоцКооп.pdf" color="primary" title="Посмотреть в браузере Устав Потребительского кооператива «СоцКооп»" target='_blank'>
+                  <InsertDriveFileIcon /> <span  style={{ marginLeft: '8px', fontSize: '16px' }}>Посмотреть Устав в браузере</span>
+                </IconButton>
+                <IconButton download={true} href="/Устав_ПК_СоцКооп.pdf" color="primary" title="Скачать Устав Потребительского кооператива «СоцКооп» в формате PDF">
+                  <PictureAsPdfIcon /> <span  style={{ marginLeft: '8px', marginBottom: '10px', fontSize: '16px' }}>Скачать Устав в формате PDF</span>
+                </IconButton>
                 <p>
                   Потребительский кооператив – это объединение людей, созданное
                   для удовлетворения их потребностей в качественных продуктах по
