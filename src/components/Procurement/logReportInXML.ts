@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 const t = (value) => String(value).trim().normalize();
 
 export const logReportInXML = (orders: any) => {
-    const orderList = Object.values(orders).map(order => Object.values(order)[0]);
+    const orderList = Object.values(orders).flatMap(order => Object.values(order));
     const xml = toXML({
         'Заказы': [
                 ...orderList.map((item) => {
